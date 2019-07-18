@@ -87,3 +87,6 @@ todo_link_only = True
 
 # Configure the autodoc extension
 autodoc_member_order = "'alphabetical"
+
+# The master toctree document.
+master_doc = 'index'
