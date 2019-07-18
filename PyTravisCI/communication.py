@@ -393,7 +393,12 @@ class Communication:
             while True:
                 # pylint: disable=access-member-before-definition
                 req = self.__session.get(self._endpoint_url)
-                response = req.json()
+
+                try:
+                    response = req.json()
+                except decoder.JSONDecodeError:
+                    response = req.text
+
                 is_error = self.is_error(response)
 
                 if not is_error and req.status_code == 200:

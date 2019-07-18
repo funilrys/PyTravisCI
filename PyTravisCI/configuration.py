@@ -85,7 +85,7 @@ class Communication:
         This must always be a :code:`str`.
     """
 
-    USER_AGENT = "travisci-python-client-in-development"
+    USER_AGENT = "PyTravisCI"
     """
     The user agent to communicate to the API.
 
