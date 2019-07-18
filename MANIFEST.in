@@ -1,0 +1,8 @@
+recursive-include PyTravisCI *.py
+recursive-include docs *.rst Makefile *.bat *.py
+recursive-include tests *.py
+include .coveragerc
+include .pylintrc
+include LICENSE
+include README.rst
+include requirements.txt
