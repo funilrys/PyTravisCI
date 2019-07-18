@@ -22,7 +22,7 @@ will never have similarities
 Documentation as the place to be!
 ---------------------------------
 
-Want to know more about PyTravisCI? We invite you to read the documentation.
+Want to know more about PyTravisCI? We invite you to read `the documentation`_.
 
 Want a local copy? We get you covered!
 
@@ -34,6 +34,7 @@ Simply run the following and enjoy our documentation!
     $ make html
     $chromium _build/html/index.html # Chromium or whatever browser you use.
 
+.. _the documentation: https://pytravisci.readthedocs.io/en/latest/
 
 Why is there a lack of tests?
 -----------------------------
