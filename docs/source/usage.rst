@@ -23,7 +23,7 @@ methods and attributes/variables.
     user = t.user()
     print("Name:", user.name)  # Give us the name of the current user.
     print("Name:", user["name"])  # Give us the name of the current user.
-    print("Login:", user.login)  # Give us the n
+    print("Login:", user.login)  # Give us the login of the current user.
 
     # Let's get the list of organizations I'm into
     orgs = t.organizations()
