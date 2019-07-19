@@ -79,8 +79,10 @@ class TestEncryption(TestCase):
         )
 
         self.envs = {"hello": "word", "world": "hello world", "break it": "hehe"}
+        self.secrets = ["hello", "world", "this", "is", "my", "secret"]
+        self.password = ":".join(self.secrets)
 
-    def test_encrypt_pkcs1v15_mode(self):
+    def test_encrypt_pkcs1v15_mode_env_var(self):
         """
         Test of :class:`PyTravisCI.encryption.Encryption.encrypt` with
         the :code:`pkcs1v15_mode` mode activated.
@@ -106,7 +108,7 @@ class TestEncryption(TestCase):
                 "Environment variable not correctly encrypted.",
             )
 
-    def test_encrypt_oeap_mode(self):
+    def test_encrypt_oeap_mode_env_var(self):
         """
         Test of :class:`PyTravisCI.encryption.Encryption.encrypt` with
         the :code:`oeap_mode` mode activated.
@@ -136,6 +138,74 @@ class TestEncryption(TestCase):
                 value,
                 "Environment variable not correctly encrypted.",
             )
+
+    def test_encrypt_pkcs1v15_mode_list_of_secrets(self):
+        """
+        Test of :class:`PyTravisCI.encryption.Encryption.encrypt` with
+        the :code:`pkcs1v15_mode` mode activated.
+        """
+
+        actual = Encryption(self.secrets, self.public_key).encrypt(pkcs1v15_mode=True)
+
+        for index, encrypted in enumerate(actual):
+            to_decrypt = b64decode(encrypted.encode("ASCII"))
+            decrypted = self.private_key.decrypt(to_decrypt, PKCS1v15()).decode()
+
+            self.assertEqual(
+                self.secrets[index], decrypted, "Secret not correctly encrypted."
+            )
+
+    def test_encrypt_oeap_mode_list_of_secrets(self):
+        """
+        Test of :class:`PyTravisCI.encryption.Encryption.encrypt` with
+        the :code:`oeap_mode` mode activated.
+        """
+
+        actual = Encryption(self.secrets, self.public_key).encrypt(
+            pkcs1v15_mode=False, oeap_mode=True
+        )
+
+        for index, encrypted in enumerate(actual):
+            to_decrypt = b64decode(encrypted.encode("ASCII"))
+            decrypted = self.private_key.decrypt(
+                to_decrypt,
+                OAEP(mgf=MGF1(algorithm=SHA256()), algorithm=SHA256(), label=None),
+            ).decode()
+
+            self.assertEqual(
+                self.secrets[index], decrypted, "Secret not correctly encrypted."
+            )
+
+    def test_encrypt_pkcs1v15_mode_password(self):
+        """
+        Test of :class:`PyTravisCI.encryption.Encryption.encrypt` with
+        the :code:`pkcs1v15_mode` mode activated.
+        """
+
+        actual = Encryption(self.password, self.public_key).encrypt(pkcs1v15_mode=True)
+
+        to_decrypt = b64decode(actual.encode("ASCII"))
+        decrypted = self.private_key.decrypt(to_decrypt, PKCS1v15()).decode()
+
+        self.assertEqual(self.password, decrypted, "Password not correctly encrypted.")
+
+    def test_encrypt_oeap_mode_password(self):
+        """
+        Test of :class:`PyTravisCI.encryption.Encryption.encrypt` with
+        the :code:`oeap_mode` mode activated.
+        """
+
+        actual = Encryption(self.password, self.public_key).encrypt(
+            pkcs1v15_mode=False, oeap_mode=True
+        )
+
+        to_decrypt = b64decode(actual.encode("ASCII"))
+        decrypted = self.private_key.decrypt(
+            to_decrypt,
+            OAEP(mgf=MGF1(algorithm=SHA256()), algorithm=SHA256(), label=None),
+        ).decode()
+
+        self.assertEqual(self.password, decrypted, "Password not correctly encrypted.")
 
 
 if __name__ == "__main__":

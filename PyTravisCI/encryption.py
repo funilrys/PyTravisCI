@@ -51,8 +51,8 @@ class Encryption:
     Encrypts the given environment variable so that they can be
     used inside a Travis CI VM.
 
-    :param dict environment_variables:
-        A dict representing the env to encrypt.
+    :param to_encrypt:
+        A dict, list or string representing the data to encrypt.
 
         Example
             ::
@@ -64,9 +64,27 @@ class Encryption:
 
             will encrpyt :code:`HELLO=WORLD`, :code:'WORLD=HELLO'
 
+            when
+
+            ::
+
+                ["Hello", "World"]
+
+            will encrypt :code:`Hello` then :code:`World`.
+
+            finally,
+
+            ::
+
+                "Hello_world"
+
+            will encrypt :code:`Hello_world`
+
         .. warning::
             if a space is present into a key, it will be replaced with an
             underscore.
+
+    :type to_encrypt: str, dict, list
 
     :parm public_key:
         The public key to use to encrypt the given env.
@@ -78,8 +96,8 @@ class Encryption:
         index of your :code:`.travis.yml` file.
     """
 
-    def __init__(self, environment_variables, public_key):
-        self.envs = environment_variables
+    def __init__(self, to_encrypt, public_key):
+        self.to_encrypt = to_encrypt
         self.public_key = self.load_public_key(public_key)
 
     @classmethod
@@ -92,6 +110,89 @@ class Encryption:
             public_key = public_key.encode()
 
         return load_pem_public_key(public_key, default_backend())
+
+    def __encrypt_it_with_pkcs1v15(self, to_encrypt):
+        """
+        Encrypt the given data using the PKCS1v15 padding.
+
+        :param bytes to_encrypt: The data to encrypt.
+
+        :rtype: str
+        """
+
+        return b64encode(self.public_key.encrypt(to_encrypt, PKCS1v15())).decode(
+            "ASCII"
+        )
+
+    def __encrypt_it_with_oeap(self, to_encrypt):
+        """
+        Encrypt the given data using the OEAP padding.
+
+        :param bytes to_encrypt: The data to encrypt.
+
+        :rtype: str
+        """
+
+        return b64encode(
+            self.public_key.encrypt(
+                to_encrypt,
+                OAEP(mgf=MGF1(algorithm=SHA256()), algorithm=SHA256(), label=None),
+            )
+        ).decode("ASCII")
+
+    def __encrypt_env_vars(self, to_encrypt, pkcs1v15_mode=True):
+        """
+        Encrypt the given environment variables.
+        """
+
+        result = []
+
+        for env_name, value in to_encrypt.items():
+            env_name = env_name.replace(" ", "_")
+
+            if " " in value:
+                to_encrypt = f'{env_name}="{value}"'.encode()
+            else:
+                to_encrypt = f"{env_name}={value}".encode()
+
+            if pkcs1v15_mode:
+                encrypted = self.__encrypt_it_with_pkcs1v15(to_encrypt)
+            else:
+                encrypted = self.__encrypt_it_with_oeap(to_encrypt)
+
+            result.append({"secure": encrypted})
+
+        return result
+
+    def __encrypt_secrets(self, to_encrypt, pkcs1v15_mode=True):
+        """
+        Encrypt the given secrets.
+        """
+
+        result = []
+
+        for data in to_encrypt:
+            if not isinstance(data, bytes):
+                data = data.encode()
+
+            if pkcs1v15_mode:
+                result.append(self.__encrypt_it_with_pkcs1v15(data))
+            else:
+                result.append(self.__encrypt_it_with_oeap(data))
+
+        return result
+
+    def __encrypt_password(self, to_encrypt, pkcs1v15_mode=True):
+        """
+        Encrypt the given password.
+        """
+
+        if not isinstance(to_encrypt, bytes):
+            to_encrypt = to_encrypt.encode()
+
+        if pkcs1v15_mode:
+            return self.__encrypt_it_with_pkcs1v15(to_encrypt)
+        return self.__encrypt_it_with_oeap(to_encrypt)
 
     def encrypt(self, pkcs1v15_mode=True, oeap_mode=False):
         """
@@ -120,24 +221,17 @@ class Encryption:
         if not pkcs1v15_mode and not oeap_mode:  # pragma: no cover
             raise MissingArgument(["pskcs1v15_mode", "oeap_mode"])
 
-        result = []
-
-        for env_name, value in self.envs.items():
-            env_name = env_name.replace(" ", "_")
-
-            if " " in value:
-                to_encrypt = f'{env_name}="{value}"'.encode()
-            else:
-                to_encrypt = f"{env_name}={value}".encode()
-
-            if pkcs1v15_mode:
-                encrypted = self.public_key.encrypt(to_encrypt, PKCS1v15())
-            else:
-                encrypted = self.public_key.encrypt(
-                    to_encrypt,
-                    OAEP(mgf=MGF1(algorithm=SHA256()), algorithm=SHA256(), label=None),
-                )
-
-            result.append({"secure": b64encode(encrypted).decode("ASCII")})
+        if isinstance(self.to_encrypt, dict):
+            result = self.__encrypt_env_vars(
+                self.to_encrypt, pkcs1v15_mode=pkcs1v15_mode
+            )
+        elif isinstance(self.to_encrypt, list):
+            result = self.__encrypt_secrets(
+                self.to_encrypt, pkcs1v15_mode=pkcs1v15_mode
+            )
+        else:
+            result = self.__encrypt_password(
+                self.to_encrypt, pkcs1v15_mode=pkcs1v15_mode
+            )
 
         return result

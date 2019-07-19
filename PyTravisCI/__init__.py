@@ -45,7 +45,7 @@ from PyTravisCI.configuration import AccessPoints
 from PyTravisCI.configuration import Communication as CommunicationConfig
 from PyTravisCI.encryption import Encryption
 
-VERSION = "1.1.2"
+VERSION = "1.2.0"
 
 # pylint: disable=too-many-public-methods
 class TravisCI:
@@ -71,7 +71,7 @@ class TravisCI:
         self.session.headers.update(headers)
 
     @classmethod
-    def encrypt(cls, environment_variables, public_key):
+    def encrypt_env_var(cls, environment_variables, public_key):
         """
         Encrypts the given environment variable so that they can be
         used inside a Travis CI VM.
@@ -103,8 +103,32 @@ class TravisCI:
         """
 
         return Encryption(
-            environment_variables=environment_variables, public_key=public_key
+            to_encrypt=environment_variables, public_key=public_key
         ).encrypt()
+
+    @classmethod
+    def encrypt_secrets(cls, secrets, public_key):
+        """
+        Encrypts the given list of secrets.
+
+        :param list secrets: The list of secrets to encrypt.
+
+        :rtype: list
+        """
+
+        return Encryption(to_encrypt=secrets, public_key=public_key).encrypt()
+
+    @classmethod
+    def encrypt_password(cls, password, public_key):
+        """
+        Encrypts the given password.
+
+        :param password: The password to encrypt.
+        :type password: str, bytes
+        :rtype: str
+        """
+
+        return Encryption(to_encrypt=password, public_key=public_key).encrypt()
 
     def active(self, owner=None, github_id=None):
         """
