@@ -59,7 +59,7 @@ class List:
         :param bool strict: Tell us if we do a strict merging.
         """
 
-        from PyTravisCI.helpers.dict import Dict
+        from .dict import Dict
 
         result = []
 

@@ -35,7 +35,8 @@ License
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 """
-from PyTravisCI.helpers.list import List
+
+from .list import List
 
 
 # pylint: disable=too-few-public-methods
