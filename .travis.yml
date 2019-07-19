@@ -39,6 +39,17 @@ after_success:
   - python-codacy-coverage -r coverage.xml
   - coveralls
 
+deploy:
+  provider: pypi
+  user: funilrys
+  password:
+    secure: oL00HUYS0dzCfQ1kZtS0EDM9JyCdH2asZb8tCngrsgcavwakqpcnNgRghG3nkU61ongRbt4VTzFSC8L4GVsnxEYaluJdNt81EanFPk3OXzbvZbhnUfvYs09WBT5NrhK2udLZv/K4ALKQ2WfJVJlMnPpG5xW+V5dHWPHnWeD5Kaq2y4C6GdlfLHD+W4G8AGRxwis+umvyCqofiZ7DIqfGIET2pKyIAE0SOlIBwSJRBhytNTLBWLdGlir8S6HNv5sDXcCq3i4alz6wMuZAN0fWUIhkN+MF+RZcEZxlV4RT6h3rFZ2dacBu2fam8mtl6IdyiwXJ6O2KkYF7Pkwi/ygkXAzQYUeAqgJfcu15Bhn6j3yCTr60RxWCvja6coY5dz3BIAbPWdMAyxGJNvswysZK5m/GJGCJ//jdRGhZoDzcEGm5mCN8CHTJTlHIoKva2VrSZUeJQAFnpY16o2WhI6r5S5YlHAedns+N0mBL1n9t9FDwwQqP6p8SXWBtDLW+XbqIEyMOEvQiRT3h6pd/5w5Zo5ua1nFqRJ90laxmXeOKYZvUSJy8ZHCevlZJNfkbLzuA8f4EiP0PLSUAQ1QUIqeJuICyJtTtDTHmoAuF/8Q7HVy/O1GaMKSczOwQcu5yePcJIVKt+PKT7L0VPWoxXzGKOtcyb2QaG+8DT7yQToOCkHU=
+  distributions: sdist bdist_wheel
+  skip_existing: true
+  on:
+    all_branches: true
+    condition: "${TRAVIS_BRANCH} =~ ^dev|master$"
+
 notifications:
   on_success: change
   on_failure: always
