@@ -39,7 +39,8 @@ License
 from base64 import b64encode
 
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric.padding import MGF1, OAEP, PKCS1v15
+from cryptography.hazmat.primitives.asymmetric.padding import (MGF1, OAEP,
+                                                               PKCS1v15)
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 

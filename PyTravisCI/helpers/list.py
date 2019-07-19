@@ -37,7 +37,7 @@ License
 """
 
 
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods, cyclic-import
 class List:
     """
     Provide some list related helpers.
