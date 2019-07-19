@@ -1,7 +1,5 @@
 env:
   matrix:
-    - PYTHON_VERSION="3.6.0"
-    - PYTHON_VERSION="3.6.1"
     - PYTHON_VERSION="3.6.2"
     - PYTHON_VERSION="3.6.3"
     - PYTHON_VERSION="3.6.4"
@@ -13,7 +11,6 @@ env:
     - PYTHON_VERSION="3.7.1"
     - PYTHON_VERSION="3.7.2"
     - PYTHON_VERSION="3.7.3"
-    - PYTHON_VERSION="3.7.4"
 
 language: generic
 sudo: false
