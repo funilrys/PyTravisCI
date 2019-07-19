@@ -98,7 +98,7 @@ if __name__ == "__main__":
         license="MIT",
         url="https://github.com/funilrys/PyTravisCI",
         platforms=["any"],
-        packages=[PACKAGE_NAME],
+        packages=[PACKAGE_NAME, f"{PACKAGE_NAME}.resource_types"],
         keywords=["Travis CI", "Travis", "CI", "API"],
         classifiers=[
             "Environment :: Console",
