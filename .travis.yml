@@ -11,6 +11,8 @@ env:
     - PYTHON_VERSION="3.7.1"
     - PYTHON_VERSION="3.7.2"
     - PYTHON_VERSION="3.7.3"
+  global:
+    - secure: yymikcfFTbyLj/+K9a8gjC/3e3sARM8fVCGRR8yW/9sJVshIqxWKjA1eKMjecmgfrF01fYocRDQDNSB0fBWYFUx2KQnsrxHWjF2MXyCZ1WfF065InFniigPvuMAz7dxZCQzJmn9Ggv09X4/+3O/biAqQduj+M9eYk7oV01fFACmI/IYJou9myN8Lv+CwkhUL+Yd6G7zUP9Aa/RpUyQ+HdYCsP2n0IUWvOTdnwqspMpuEQthdbZZ8wOVqY/KStcLVu33kaT7+4Z3SJsGFkBR9PXh+cP1lECOvdAFOA9ZFRV/pbdnIrG2HLL7pS0s57e+eQ62qVxw2arYMz/8IRLM9IUZOsRXK0MyFSe8T1mNqMQzwvORTfpTD6FNpfDOiYiGdL06GJ3h5YYCNrABbEC5DVR/zxqAyiun7tDnlNd8pvJ3j94JnWdFX/w14eUUEok1vijeOEF2Lrd0Cq5+kD7cyvaeeFA18P6/DYDhMf3eiS7b/PmOYA9TSRI5FoMl+EnAdkB2wOh9Y6CNMDNwOA/EuEeX5WjOxw8i+dpMQTrVEzEA7dJFn3yVy8+Cswtl5EqHjWjJx1IMfG2R5iUQz2YxOzfPRu+jEYttOpJdEUJQqNm8WotSnwIlTZCA0QxGETHWPsiiN4CitQWxImTUzbiq2pZ6399nFbGcAlsvj7BjqLxI=
 
 language: generic
 sudo: false
@@ -33,7 +35,7 @@ install:
   - source activate test-environment
   - python -VV
   - pip --version
-  - pip install pylint coverage coveralls codacy-coverage
+  - pip install pylint coverage coveralls codacy-coverage pyyaml
 
 script:
   - python setup.py install
