@@ -1,6 +1,7 @@
 recursive-include PyTravisCI *.py
-recursive-include docs *.rst Makefile *.bat *.py
+recursive-include resource_types *.py
 recursive-include tests *.py
+recursive-include docs *.rst Makefile *.bat *.py
 include .coveragerc
 include .pylintrc
 include LICENSE

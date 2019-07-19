@@ -45,7 +45,7 @@ from PyTravisCI.configuration import AccessPoints
 from PyTravisCI.configuration import Communication as CommunicationConfig
 from PyTravisCI.encryption import Encryption
 
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 # pylint: disable=too-many-public-methods
 class TravisCI:
