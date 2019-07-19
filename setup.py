@@ -34,10 +34,10 @@ License
         SOFTWARE.
 """
 
-from os import getcwd
-from setuptools import setup
 from re import compile as comp
 from unittest import TestLoader
+
+from setuptools import setup
 
 PACKAGE_NAME = "PyTravisCI"
 
@@ -48,9 +48,9 @@ def test_suite():
     """
 
     test_loader = TestLoader()
-    test_suite = test_loader.discover("tests", pattern="test_*.py")
+    discovered_tests = test_loader.discover("tests", pattern="test_*.py")
 
-    return test_suite
+    return discovered_tests
 
 
 def get_requirements():
@@ -71,9 +71,7 @@ def get_version():
 
     to_match = comp(r'VERSION\s=\s"(.*)"\n')
 
-    with open(
-        f"{PACKAGE_NAME}/__init__.py", encoding="utf-8"
-    ) as file_stream:
+    with open(f"{PACKAGE_NAME}/__init__.py", encoding="utf-8") as file_stream:
         extracted = to_match.findall(file_stream.read())[0]
 
     return ".".join([x for x in extracted.split(".") if x.isdigit()])
