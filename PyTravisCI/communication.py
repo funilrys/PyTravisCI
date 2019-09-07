@@ -510,24 +510,27 @@ class Communication:
             if not data:
                 data = {}
 
-            req = self.__session.post(self._endpoint_url, data=data)
-            response = req.json()
-            is_error = self.is_error(response)
+            try:
+                req = self.__session.post(self._endpoint_url, data=data)
+                response = req.json()
+                is_error = self.is_error(response)
 
-            if not is_error and req.status_code == 200:
-                result = self.filter_response(response)
-            elif is_error:
-                raise TravisCIError(
-                    req.url,
-                    self.get_error_message(response),
-                    self.get_error_type(response),
-                )
-            else:
-                raise TravisCIError(
-                    req.url,
-                    http_status_code_responses[req.status_code],
-                    req.status_code,
-                )
+                if not is_error and req.status_code == 200:
+                    result = self.filter_response(response)
+                elif is_error:
+                    raise TravisCIError(
+                        req.url,
+                        self.get_error_message(response),
+                        self.get_error_type(response),
+                    )
+                else:
+                    raise TravisCIError(
+                        req.url,
+                        http_status_code_responses[req.status_code],
+                        req.status_code,
+                    )
 
-            return result
+                return result
+            except decoder.JSONDecodeError:
+                raise TravisCIError(req.url, req.text, req.status_code)
         return None
