@@ -154,8 +154,6 @@ class Branches(Communication):
         else:
             if isinstance(sort_by, str):
                 sort_by = [sort_by]
-            else:
-                sort_by = sort_by
 
         self._parameters["sort_by"] = ",".join(sort_by)
         repo_id_or_slug = self.format_slug(repo_id_or_slug)

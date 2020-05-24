@@ -59,6 +59,7 @@ class List:
         :param bool strict: Tell us if we do a strict merging.
         """
 
+        # pylint: disable=import-outside-toplevel
         from .dict import Dict
 
         result = []

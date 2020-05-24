@@ -294,8 +294,6 @@ class Communication:
                         value = urllib_parse.quote(value, safe="")
                     elif isinstance(value, bool):
                         value = str(value).lower()
-                    else:
-                        value = value
 
                     result += f"{index}={value}&"
 
