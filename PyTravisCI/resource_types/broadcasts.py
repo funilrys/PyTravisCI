@@ -1,104 +1,69 @@
 """
-Just another Travis CI (Python) API client.
+Just another Travis CI (API) Python interface.
 
-Provide the access to the broadcasts resource type.
+A module which provides the "Broadcasts" resource type.
 
-Author
+Author:
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
 
-Project link
+Project link:
     https://github.com/funilrys/PyTravisCI
 
+Project documentation:
+    https://pytravisci.readthedocs.io/en/latest/
+
 License
-    ::
+::
 
 
-        MIT License
+    MIT License
 
-        Copyright (c) 2019 Nissar Chababy
+    Copyright (c) 2019, 2020 Nissar Chababy
 
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 """
 
-from ..communication import Communication
+from typing import List, Optional
+
+from . import _all as resource_types
+from .base import ResourceTypesBase
 
 
-class Broadcasts(Communication):
+class Broadcasts(ResourceTypesBase):
     """
-    Provide the list of broadcasts of the current user.
+    Provides a list of broadcasts.
 
     Official Travis CI API documentation
-        - https://developer.travis-ci.org/resource/broadcasts#Broadcasts
-        - https://developer.travis-ci.org/resource/broadcasts#for_current_user
+        - https://developer.travis-ci.org/resource/broadcasts
 
-    :param root:
-        An initiated instance of :class:`~PyTravisCI.TravisCI`.
-    :type root: :class:`~PyTravisCI.TravisCI`
-    :param dict parameters:
-        A :code:`dict` of parameters to parse to the request.
-
-        .. seealso::
-            - :attr:`~PyTravisCI.resource_types.broadcasts.Broadcasts._parameters`
-
-    :ivar list broadcasts: List of broadcasts.
-
-    :raise ValueError:
-        When :code:`parameters` is not a :code:`dict`.
-    :raise TravisCIError:
-        When something went wrong while communicating,
-        getting or extracting data from or with the API.
+    :ivar broadcasts: List of broadcasts.
+    :vartype broadcasts:
+        List[:class:`~PyTravisCI.resource_types.broadcast.Broadcast`]
     """
 
-    __path_name_base__ = "broadcasts"
+    __iter_through__: str = "broadcasts"
+    broadcasts: Optional[List["resource_types.Broadcast"]]
 
-    _excluded_parameters = ["include"]
-    """
-    The list of parameters to exclude.
-    """
+    def __init__(self, **kwargs) -> None:
+        if "broadcasts" in kwargs:
+            kwargs["broadcasts"] = [
+                resource_types.Broadcast(**x) for x in kwargs["broadcasts"]
+            ]
 
-    _parameters = {"active": None, "broadcast.active": None}
-    """
-    Provide the parameters we can parse to the query string.
-
-    Indexes
-        :code:`active`
-            Alias for :code:`broadcast.active`.
-        :code:`broadcast.active`
-            Filters broadcasts by whether or not the brodacast should still be displayed.
-
-    .. warning::
-        If an index is set to :code:`None`, it will be omitted.
-
-    .. warning::
-        Only the indexes listed into this variable will be parsed.
-    """
-
-    def __init__(self, root, parameters=None):
-        super(Broadcasts, self).__init__(root)
-
-        self.filter_parameters(parameters)
-
-        self._endpoint_url = self.bind_path_name_to_access_point(
-            self.access_point,
-            self.__path_name_base__ + self.convert_parameters_to_get_param(),
-        )
-
-        self.response_to_attribute(
-            self, self.standardize.it(self.get_request(follow_next_page=True))
-        )
+        super().__init__(**kwargs)

@@ -1,172 +1,214 @@
 """
-Just another Travis CI (Python) API client.
+Just another Travis CI (API) Python interface.
 
-Provide the access to the job resource type.
+A module which provides the "Job" resource type.
 
-Author
+Author:
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
 
-Project link
+Project link:
     https://github.com/funilrys/PyTravisCI
 
+Project documentation:
+    https://pytravisci.readthedocs.io/en/latest/
+
 License
-    ::
+::
 
 
-        MIT License
+    MIT License
 
-        Copyright (c) 2019 Nissar Chababy
+    Copyright (c) 2019, 2020 Nissar Chababy
 
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 """
 
-from ..communication import Communication
-from ..configuration import States as StatesConfig
-from ..exceptions import MissingArgument, TravisCIError
+from datetime import datetime
+from typing import List, Optional, Union
+
+import PyTravisCI.communicator._all as communicator
+import PyTravisCI.defaults as defaults
+import PyTravisCI.exceptions as exceptions
+
+from . import _all as resource_types
+from .base import ResourceTypesBase
 
 
-class Job(Communication):
+class Job(ResourceTypesBase):
     """
-    Provide the information of a given :code:`job_id`.
+    Provides the description of a single build.
 
     Official Travis CI API documentation
-        - https://developer.travis-ci.org/resource/job#Job
-        - https://developer.travis-ci.org/resource/job#find
-        - https://developer.travis-ci.org/resource/job#cancel
-        - https://developer.travis-ci.org/resource/job#restart
-        - https://developer.travis-ci.org/resource/job#debug
+        - https://developer.travis-ci.org/resource/job
 
-    :param root:
-        An initiated instance of :class:`~PyTravisCI.TravisCI`.
-    :type root: :class:`~PyTravisCI.TravisCI`
-    :param job_id:
-        A job ID to get the information for.
-
-        Can be
-            :code:`{job.id}`
-                Value uniquely identifying the job.
-
-    :type job_id: str,int
-
-    :ivar int id: Value uniquely identifying the job.
-    :ivar bool allow_failure: The job's allow_failure.
-    :ivar str number: Incremental number for a repository's builds.
-    :ivar str state: Current state of the job.
-    :ivar started_at: When the job started.
-    :vartype started_at: :class:`~datetime.datetime`
-    :ivar finished_at: When the job finished.
-    :vartype finished_at: :class:`~datetime.datetime`
-    :ivar dict build: The build the job is associated with.
-    :ivar str queue: Worker queue this job is/was scheduled on.
-    :ivar dict repository: GitHub user or organization the job belongs to.
-    :ivar dict commit: The commit the job is associated with.
-    :ivar dict owner: GitHub user or organization the job belongs to.
-    :ivar dict stage: The stages of the job.
-    :ivar created_at: When the job was created.
-    :vartype created_at: :class:`~datetime.datetime`
-    :ivar updated_at: When the job was updated.
-    :vartype updated_at: :class:`~datetime.datetime`
-    :ivar bool private: Whether or not the job is private.
-
-    :raise MissingArgument:
-        When :code:`job_id` is not given or empty.
-    :raise TravisCIError:
-        When something went wrong while communicating,
-        getting or extracting data from or with the API.
+    :ivar int id:
+        Value uniquely identifying the job.
+    :ivar bool allow_failure:
+        The job's allow_failure.
+    :ivar str number:
+        Incremental number for a repository's builds.
+    :ivar str state:
+        Current state of the job.
+    :ivar started_at:
+        When the job started.
+    :vartype started_at: :py:class:`~datetime.datetime`
+    :ivar finished_at:
+        When the job finished.
+    :vartype finished_at: :py:class:`~datetime.datetime`
+    :ivar build:
+        The build the job is associated with.
+    :vartype build: :class:`~PyTravisCI.resource_types.build.Build`
+    :ivar str queue:
+        Worker queue this job is/was scheduled on.
+    :ivar repository:
+        GitHub user or organization the job belongs to.
+    :vartype repository: :class:`~PyTravisCI.resource_types.repository.Repository`
+    :ivar commit:
+        The commit the job is associated with.
+    :vartype commit: :class:`~PyTravisCI.resource_types.commit.Commit`
+    :ivar owner:
+        GitHub user or organization the job belongs to.
+    :vartype owner:
+        Union[
+            :class:`~PyTravisCI.resource_types.user.User`,
+            :class:`~PyTravisCI.resource_types.organization.Organization`
+        ]
+    :ivar stage:
+        The stages of the job.
+    :vartype stage: List[:class`~PyTravisCI.resource_types.stage.Stage`]
+    :ivar created_at:
+        When the job was created.
+    :vartype created_at: :py:class:`~datetime.datetime`
+    :ivar updated_at:
+        When the job was updated.
+    :vartype updated_at: :py:class:`~datetime.datetime`
     """
 
-    __path_name_base__ = "job"
+    id: Optional[int] = None
+    allow_failure: Optional[bool] = None
+    number: Optional[str] = None
+    state: Optional[str] = None
+    started_at: Optional[str] = None
+    finished_at: Optional[str] = None
+    build: Optional["resource_types.Build"] = None
+    queue: Optional[str] = None
+    repository: Optional["resource_types.Repository"] = None
+    commit: Optional["resource_types.Commit"] = None
+    owner: Optional[Union["resource_types.User", "resource_types.Organization"]] = None
+    stage: Optional[List["resource_types.Stage"]] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    private: Optional[bool] = None
 
-    def __init__(self, root, job_id):
-        super(Job, self).__init__(root)
+    def __init__(self, **kwargs) -> None:
+        if "build" in kwargs:
+            kwargs["build"] = resource_types.Build(**kwargs["build"])
 
-        if not job_id:
-            raise MissingArgument("job_id")
+        if "repository" in kwargs:
+            kwargs["repository"] = resource_types.Repository(**kwargs["repository"])
 
-        self._endpoint_url = (
-            self.__standard_endpoint_url
-        ) = self.bind_path_name_to_access_point(
-            self.access_point, f"{self.__path_name_base__}/{job_id}"
+        if "commit" in kwargs:
+            kwargs["commit"] = resource_types.Commit(**kwargs["commit"])
+
+        if "stage" in kwargs and kwargs["stage"]:
+            kwargs["stage"] = resource_types.Stage(**kwargs["stage"])
+
+        if "owner" in kwargs and "_at_type" in kwargs["owner"]:
+            if kwargs["owner"]["_at_type"] == "user":
+                kwargs["owner"] = resource_types.User(**kwargs["owner"])
+            elif kwargs["owner"]["_at_type"] == "organization":
+                kwargs["owner"] = resource_types.Organization(**kwargs["owner"])
+
+        super().__init__(**kwargs)
+
+    def sync(self) -> "resource_types.Job":
+        """
+        Fetches the latest information of the current job.
+        """
+
+        comm = getattr(communicator, self.__class__.__name__)(
+            self._PyTravisCI["com"]["requester"]
         )
 
-        self.response_to_attribute(
-            self, self.standardize.it(self.get_request(follow_next_page=True))
-        )
+        self.__dict__ = comm.from_id(job_id=self.id).__dict__
 
-    def cancel(self):
+        return self
+
+    def get_log(self, *, params: Optional[dict] = None) -> "resource_types.Log":
+        """
+        Provides the logs of the current job.
+
+        :param params:
+            The query parameters to append to the URL.
+        """
+
+        comm = getattr(communicator, "Log")(self._PyTravisCI["com"]["requester"])
+
+        return comm.from_id(job_id=self.id, parameters=params)
+
+    def cancel(self) -> "resource_types.Job":
         """
         Cancels the current job.
-
-        :return:
-            A boolean if the request was made and :code:`None` if the
-            state of the build is already :code:`canceled`, :code:`failed`
-            or :code:`errored`.
         """
 
-        if self.state not in StatesConfig.STOPPED:
-            self._endpoint_url = self.bind_path_name_to_access_point(
-                self.__standard_endpoint_url, "cancel"
-            )
+        if self.state.lower() in defaults.states.STOPPED + defaults.states.FINISHED:
+            raise exceptions.JobAlreadyStopped()
 
-            try:
-                _ = self.post_request()
-            except TravisCIError as exception:
-                if (
-                    "Accepted" in exception.error_message()
-                    or "job_not_cancelable" in exception.error_type()
-                ):
-                    return True
-                raise exception
-        return None
+        comm = getattr(communicator, self.__class__.__name__)(
+            self._PyTravisCI["com"]["requester"]
+        )
 
-    def restart(self):
+        return comm.cancel(job_id=self.id)
+
+    def restart(self) -> "resource_types.Job":
         """
         Restarts the current job.
 
-        :return:
-            A boolean if the request was made and :code:`None` if the state
-            of the job is :code:`created` or :code:`started`.
+        :param force:
+            Force the restart by cancelling first.
+        :param wait_until_started:
+            Whether we wait until we are sure that the job is started.
 
-        :rtype: bool,None
-        :raise TravisCIError:
-            When somthing went wrong while communicating,
-            getting or extracting data from or with the API.
+        :raise JobAlreadyStarted:
+            When the current job was already started.
         """
 
-        if self.state not in StatesConfig.PROCESSING:
-            self._endpoint_url = self.bind_path_name_to_access_point(
-                self.__standard_endpoint_url, "restart"
-            )
+        if self.state.lower() in defaults.states.ACTIVE:
+            raise exceptions.JobAlreadyStarted()
 
-            try:
-                _ = self.post_request()
-            except TravisCIError as exception:
-                if "Accepted" in exception.error_message():
-                    return True
-                raise exception
-        return None
-
-    def debug(self):
-        """
-        :raise NotImplementedError: When called.
-        """
-
-        raise NotImplementedError(
-            "This method is not implemented yet because I could not find a way to test its logic."
+        comm = getattr(communicator, self.__class__.__name__)(
+            self._PyTravisCI["com"]["requester"]
         )
+
+        return comm.restart(job_id=self.id)
+
+    def debug(self) -> "resource_types.Job":
+        """
+        Restart the current job in debug mode.
+
+        .. warning::
+            This method may not work if you are
+            not allowed to restart in debug mode.
+        """
+
+        comm = getattr(communicator, self.__class__.__name__)(
+            self._PyTravisCI["com"]["requester"]
+        )
+
+        return comm.debug(job_id=self.id)

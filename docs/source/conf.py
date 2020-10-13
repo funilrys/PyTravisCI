@@ -12,10 +12,11 @@
 #
 import os
 import sys
+import re
 
 sys.path.insert(0, os.path.abspath("../../"))
 
-from setup import PACKAGE_NAME, comp
+from setup import PACKAGE_NAME
 
 
 def get_version():
@@ -23,12 +24,10 @@ def get_version():
     Extract the version from our package.
     """
 
-    to_match = comp(r'VERSION\s=\s"(.*)"\n')
-    extracted = to_match.findall(
-        open(f"../../{PACKAGE_NAME}/__init__.py", encoding="utf-8").read()
-    )[0]
+    to_match = re.compile(r'__version__\s=\s"(.*)"')
+    with open(f"../../{PACKAGE_NAME}/__about__.py", encoding="utf-8") as file_stream:
 
-    return ".".join([x for x in extracted.split(".") if x.isdigit()])
+        return to_match.findall(file_stream.read())[0]
 
 
 # -- Project information -----------------------------------------------------
@@ -56,7 +55,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "requests": ("http://docs.python-requests.org/en/latest", None),
+    "requests": ("https://requests.readthedocs.io/en/latest", None),
     "python": ("https://docs.python.org/3/", None),
 }
 
@@ -86,7 +85,7 @@ todo_include_todos = True
 todo_link_only = True
 
 # Configure the autodoc extension
-autodoc_member_order = "'alphabetical"
+autodoc_member_order = "alphabetical"
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"

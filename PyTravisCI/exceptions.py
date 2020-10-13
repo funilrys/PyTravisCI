@@ -1,183 +1,164 @@
 """
-Just another Travis CI (Python) API client.
+Just another Travis CI (API) Python interface.
 
-Provide the exceptions we (might) raise.
+A module which provides all our exceptions.
 
-Author
+Author:
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
 
-Project link
+Project link:
     https://github.com/funilrys/PyTravisCI
 
+Project documentation:
+    https://pytravisci.readthedocs.io/en/latest/
+
 License
-    ::
+::
 
 
-        MIT License
+    MIT License
 
-        Copyright (c) 2019 Nissar Chababy
+    Copyright (c) 2019, 2020 Nissar Chababy
 
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 """
 
+from typing import Union
 
-class TravisCIError(Exception):
+
+class PyTravisCIException(Exception):
     """
-    Raise an exception with the error we got from the API.
-
-    :param str url: The endpoint URL we communicated with.
-    :param str error_message: The error message.
-    :param str error_type: The error type.
+    The base of all our exceptions.
     """
 
-    def __init__(self, url, error_message, error_type):
+
+class TravisCIError(PyTravisCIException):
+    """
+    Raises an exception with the error we got from the API.
+    """
+
+    def __init__(
+        self,
+        url: str,
+        error_message: str,
+        error_type: str,
+        response: Union[dict, str] = None,
+    ) -> None:
         self.url = url
         self.err_message = error_message
         self.err_type = error_type
+        self.response = response
 
-        super(TravisCIError, self).__init__(self.message())
+        super().__init__(self.message())
 
-    def message(self):
+    def message(self) -> str:
         """
-        Provide the message to return while raising the exception.
+        Provides the message to raise.
         """
 
-        return f"[{self.url},{self.err_type}]: {self.err_message}"
+        return f"[{self.err_type}::{self.url}] {self.err_message}"
 
-    def error_message(self):
+    def get_error_message(self):
         """
-        Provide the error message (ONLY).
+        Provides the error message from upstream.
         """
 
         return self.err_message
 
-    def error_type(self):
+    def get_error_type(self):
         """
-        Provide the error type (ONLY).
+        Provides the error type from upstream.
         """
 
         return self.err_type
 
-    def error_url(self):
+    def get_url(self):
         """
-        Provide the URL we requested when we got teh error.
+        Provides the url from upstream.
         """
 
         return self.url
 
-
-class MissingArgument(Exception):
-    """
-    Raise an exception for the case that one or multiple arguments are not given.
-
-    :param missing_argument: The name of the missing argument(s).
-    :type missing_argument: list,str
-    """
-
-    def __init__(self, missing_argument):
-        if not isinstance(missing_argument, list):
-            self.missing = [missing_argument]
-        else:
-            self.missing = missing_argument
-
-        self.missing = [f"<{x}>" for x in self.missing]
-
-        super(MissingArgument, self).__init__(self.message())
-
-    def message(self):
+    def get_response(self):
         """
-        Construct the message to return.
+        Provides the complete response from Travis CI.
         """
 
-        if len(self.missing) > 1:
-            beginning = "{0} nor {1}".format(
-                ", ".join(self.missing[:-1]), self.missing[-1]
-            )
-        else:
-            beginning = f"{self.missing[0]} is not"
-
-        return f"{beginning} given."
+        return self.response
 
 
-class InvalidIntArgument(Exception):
+class PageNotFound(PyTravisCIException):
     """
-    Raise an exception for the case that an ID which should be an integer
-    (or a digit string) is excepted and not given.
-
-    :param invalid_argument: The name of the invalid argument(s).
-    :type invalid_argument: list,str
+    Raises an exception which informs the end-user that
+    we could not find a page.
     """
 
-    def __init__(self, invalid_argument):
-        if not isinstance(invalid_argument, list):
-            self.invalid = [invalid_argument]
-        else:
-            self.invalid = invalid_argument
 
-        self.invalid = [f"<{x}>" for x in self.invalid]
-
-        super(InvalidIntArgument, self).__init__(self.message())
-
-    def message(self):
-        """
-        Construct the message to return.
-        """
-
-        if len(self.invalid) > 1:
-            beginning = "{0} and {1} are not".format(
-                ", ".join(self.invalid[:-1]), self.invalid[-1]
-            )
-        else:
-            beginning = f"{self.invalid[0]} is not"
-
-        return f"{beginning} valid. {type(int)} or `str.isdigit()` expected."
-
-
-class IncompatibleArgument(Exception):
+class NextPageNotFound(PageNotFound):
     """
-    Raise an exception when one or more arguments are not compatible together.
-
-    :param incompatible_argument: The name of the argument(s) which are incompatible together.
-    :type incompatible_argument: list
-
-    :raise ValueError:
-        When :code:`incompatible_argument` is not a list.
-    :raise ValueError:
-        When :code:`incompatible_argument` don't have at least 2 indexes.
+    Informs that the next page could not be found.
     """
 
-    def __init__(self, incompatible_argument):
-        if not isinstance(incompatible_argument, list):
-            raise ValueError("We except a list.")
 
-        if not len(incompatible_argument) > 1:
-            raise ValueError("We except at least 2 arguments.")
+class PreviousPageNotFound(PageNotFound):
+    """
+    Informs that the previous page could not be found.
+    """
 
-        self.incompatible = [f"<{x}>" for x in incompatible_argument]
 
-        super(IncompatibleArgument, self).__init__(self.message())
+class FirstPageNotFound(PageNotFound):
+    """
+    Informs that the first page could not be found.
+    """
 
-    def message(self):
-        """
-        Construct the message to run.
-        """
 
-        return "{0} and {1} are not compatible together.".format(
-            ", ".join(self.incompatible[:-1]), self.incompatible[-1]
-        )
+class LastPageNotFound(PageNotFound):
+    """
+    Informs that the last page could not be found.
+    """
+
+
+class NotIncomplete(PyTravisCIException):
+    """
+    Informs that the current object is not incomplete.
+    """
+
+
+class JobAlreadyStarted(PyTravisCIException):
+    """
+    Informs that the current job was already started.
+    """
+
+
+class JobAlreadyStopped(PyTravisCIException):
+    """
+    Informs that the current job was already stopped.
+    """
+
+
+class BuildAlreadyStarted(PyTravisCIException):
+    """
+    Informs that the current build was already started.
+    """
+
+
+class BuildAlreadyStopped(PyTravisCIException):
+    """
+    Informs that the current build was already stopped.
+    """

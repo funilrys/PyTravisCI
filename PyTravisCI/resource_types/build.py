@@ -1,188 +1,231 @@
 """
-Just another Travis CI (Python) API client.
+Just another Travis CI (API) Python interface.
 
-Provide the access to the build resource type.
+A module which provides the "Build" resource type.
 
-Author
+Author:
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
 
-Project link
+Project link:
     https://github.com/funilrys/PyTravisCI
 
+Project documentation:
+    https://pytravisci.readthedocs.io/en/latest/
+
 License
-    ::
+::
 
 
-        MIT License
+    MIT License
 
-        Copyright (c) 2019 Nissar Chababy
+    Copyright (c) 2019, 2020 Nissar Chababy
 
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 """
 
-from ..communication import Communication
-from ..configuration import States as StatesConfig
-from ..exceptions import InvalidIntArgument, MissingArgument, TravisCIError
+from datetime import datetime
+from typing import List, Optional
+
+import PyTravisCI.communicator._all as communicator
+import PyTravisCI.defaults as defaults
+import PyTravisCI.exceptions as exceptions
+
+from . import _all as resource_types
+from .base import ResourceTypesBase
 
 
-class Build(Communication):
+class Build(ResourceTypesBase):
     """
-    Provide the information of a given :code:`build_id`.
+    Provides the description of a build
 
     Official Travis CI API documentation
-        - https://developer.travis-ci.org/resource/build#Build
-        - https://developer.travis-ci.org/resource/build#find
-        - https://developer.travis-ci.org/resource/build#cancel
-        - https://developer.travis-ci.org/resource/build#restart
+        - https://developer.travis-ci.org/resource/build
 
-    :param root:
-        An initiated instance of :class:`~PyTravisCI.TravisCI`.
-    :type root: :class:`~PyTravisCI.TravisCI`
-    :param build_id:
-        The ID of the build to get information for.
-
-        Can be
-            :code:`{build.id}`
-                Value uniquely identifying the build.
-    :type build_id: str,int
-
-    :ivar int id: Value uniquely identifying the build.
-    :ivar str number: Incremental number for a repository's builds.
-    :ivar str state: Current state of the build.
-    :ivar int duration: Wall clock time in seconds.
-    :ivar str event_type: Event that triggered the build.
-    :ivar str previous_state: State of the previous build (useful to see if state changed).
-    :ivar str pull_request_title: Title of the build's pull request.
-    :ivar int pull_request_number: Number of the build's pull request.
-    :ivar started_at: When the build started.
-    :vartype started_at: :class:`~datetime.datetime`
-    :ivar finished_at: When the build finished.
-    :vartype finished_at: :class:`~datetime.datetime`
-    :ivar bool private: Whether or not the build is private.
-    :ivar dict repository: GitHub user or organization the build belongs to.
-    :ivar dict branch: The branch the build is associated with.
-    :ivar str tag: The build's tag.
-    :ivar dict commit: The commit the build is associated with.
-    :ivar list jobs: List of jobs that are part of the build's matrix.
-    :ivar list stages: The stages of the build.
-    :ivar dict created_by: The User or Organization that created the build.
-    :ivar updated_at: The last time the build was updated.
-    :vartype updated_at: :class:`~datetime.datetime`
-
-    :raise MissingArgument:
-        When :code:`build_id` is not givne or is empty.
-    :raise InvalidIntArgument:
-        When :code:`build_id` is not an :code:`int` or :code:str.isdigit()`.
-    :raise TravisCIError:
-        When something went wrong while communicating,
-        getting or extracting data from or with the API.
+    :ivar int id:
+        Value uniquely identifying the build.
+    :ivar str number:
+        Incremental number for a repository's builds.
+    :ivar str state:
+        Current state of the build.
+    :ivar int duration:
+        Wall clock time in seconds.
+    :ivar str event_type:
+        Event that triggered the build.
+    :ivar str previous_state:
+        State of the previous build (useful to see if state changed).
+    :ivar str pull_request_title:
+        Title of the build's pull request.
+    :ivar int pull_request_number:
+        Number of the build's pull request.
+    :ivar started_at:
+        When the build started.
+    :vartype started_at: :py:class:`~datetime.datetime`
+    :ivar finished_at:
+        When the build finished.
+    :vartype finished_at: :py:class:`~datetime.datetime`
+    :ivar bool private:
+        Whether or not the build is private.
+    :ivar repository:
+        GitHub user or organization the build belongs to.
+    :vartype repository: :class:`~PyTravisCI.resource_types.repository.Repository`
+    :ivar branch:
+        The branch the build is associated with.
+    :vartype branch: :class:`~PyTravisCI.resource_types.branch.Branch`
+    :ivar str tag:
+        The build's tag.
+    :ivar commit:
+        The commit the build is associated with.
+    :vartype commit: :class:`~PyTravisCI.resource_types.commit.Commit`
+    :ivar jobs:
+        List of jobs that are part of the build's matrix.
+    :vartype jobs: List[:class:`~PyTravisCI.resource_types.job.Job`]
+    :ivar stages:
+        The stages of the build.
+    :vartype stages: List[:class:`~PyTravisCI.resource_types.stage.Stage`]
+    :ivar created_by:
+        The User or Organization that created the build.
+    :vartype created_by:
+        Union[
+            :class:`~PyTravisCI.resource_types.user.User`,
+            :class:`~PyTravisCI.resource_types.organization.Organization`
+        ]
+    :ivar updated_at:
+        The last time the build was updated.
+    :vartype updated_at: :py:class:`~datetime.datetime`
     """
 
-    __path_name_base__ = "build"
+    id: Optional[int] = None
+    number: Optional[str] = None
+    state: Optional[str] = None
+    duration: Optional[int] = None
+    event_type: Optional[str] = None
+    previous_state: Optional[str] = None
+    pull_request_title: Optional[str] = None
+    pull_request_number: Optional[int] = None
+    started_at: Optional[datetime] = None
+    finished_at: Optional[datetime] = None
+    private: Optional[bool] = None
+    repository: Optional["resource_types.Repository"] = None
+    branch: Optional["resource_types.Branch"] = None
+    tag: Optional[str] = None
+    commit: Optional["resource_types.Commit"] = None
+    jobs: Optional[List["resource_types.Job"]] = None
+    stages: Optional[List["resource_types.Stage"]] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
-    def __init__(self, root, build_id):
-        super(Build, self).__init__(root)
+    def __init__(self, **kwargs) -> None:
+        if "jobs" in kwargs:
+            kwargs["jobs"] = [resource_types.Job(**x) for x in kwargs["jobs"]]
 
-        if not build_id:
-            raise MissingArgument("build_id")
+        if "repository" in kwargs:
+            kwargs["repository"] = resource_types.Repository(**kwargs["repository"])
 
-        if not self.is_digit(build_id):
-            raise InvalidIntArgument("build_id")
+        if "branch" in kwargs:
+            kwargs["branch"] = resource_types.Branch(**kwargs["branch"])
 
-        self.___standard_enpoint_url = self.bind_path_name_to_access_point(
-            self.access_point, f"{self.__path_name_base__}/{build_id}"
+        if "stages" in kwargs:
+            kwargs["stages"] = [resource_types.Stage(**x) for x in kwargs["stages"]]
+
+        if "commit" in kwargs:
+            kwargs["commit"] = resource_types.Commit(**kwargs["commit"])
+
+        if "created_by" in kwargs and "_at_type" in kwargs["created_by"]:
+            if kwargs["created_by"]["_at_type"] == "user":
+                kwargs["created_by"] = resource_types.User(**kwargs["created_by"])
+            elif kwargs["created_by"]["_at_type"] == "organization":
+                kwargs["created_by"] = resource_types.Organization(
+                    **kwargs["created_by"]
+                )
+
+        super().__init__(**kwargs)
+
+    def sync(self) -> "resource_types.Build":
+        """
+        Fetches the latest information of the current job.
+        """
+
+        comm = getattr(communicator, self.__class__.__name__)(
+            self._PyTravisCI["com"]["requester"]
         )
 
-        self._endpoint_url = self.___standard_enpoint_url
+        self.__dict__ = comm.from_id(build_id=self.id).__dict__
 
-        self.response_to_attribute(
-            self, self.standardize.it(self.get_request(follow_next_page=False))
+        return self
+
+    def get_jobs(self, *, params: Optional[dict] = None) -> "resource_types.Jobs":
+        """
+        Provides the list of jobs of the current build
+
+        Official Travis CI API documentation:
+            - https://developer.travis-ci.org/resource/jobs
+
+        :param params:
+            The query parameters to append to the URL.
+        """
+
+        comm = getattr(communicator, "Jobs")(self._PyTravisCI["com"]["requester"])
+
+        return comm.from_build_id(build_id=self.id, parameters=params)
+
+    def get_stages(self, *, params: Optional[dict] = None) -> "resource_types.Stages":
+        """
+        Provides the list of stages of the current build
+
+        Official Travis CI API documentation:
+            - https://developer.travis-ci.org/resource/stages
+
+        :param params:
+            The query parameters to append to the URL.
+        """
+
+        comm = getattr(communicator, "Stages")(self._PyTravisCI["com"]["requester"])
+
+        return comm.from_build_id(build_id=self.id, parameters=params)
+
+    def cancel(self) -> "resource_types.Build":
+        """
+        Cancels the current build.
+        """
+
+        if (
+            self.state.lower() in defaults.states.STOPPED
+            or self.state.lower() in defaults.states.FINISHED
+        ):
+            raise exceptions.BuildAlreadyStopped()
+
+        comm = getattr(communicator, self.__class__.__name__)(
+            self._PyTravisCI["com"]["requester"]
         )
 
-    def cancel(self):
+        return comm.cancel(build_id=self.id)
+
+    def restart(self) -> "resource_types.Build":
         """
-        Cancels a currently running build. It will set the :code:`build`
-        and associated :code:`jobs` to :code:`"state": "canceled"`.
-
-        :return:
-            A boolean if the request was made and :code:`None` if the
-            state of the build is already :code:`canceled`.
-
-        :rtype: bool,None
-        :raise TravisCIError:
-            When something went wrong while communicating,
-            getting or extracting data from or with the API.
+        Restarts the current build.
         """
 
-        if self.state not in StatesConfig.STOPPED:
-            self._endpoint_url = self.bind_path_name_to_access_point(
-                self.___standard_enpoint_url, "cancel"
-            )
+        if self.state.lower() in defaults.states.ACTIVE:
+            raise exceptions.BuildAlreadyStarted()
 
-            try:
-                response = self.post_request()
+        comm = getattr(communicator, self.__class__.__name__)(
+            self._PyTravisCI["com"]["requester"]
+        )
 
-                if "build" in response and "id" in response["build"]:
-                    self.response_to_attribute(
-                        self, self.standardize.it(response["build"])
-                    )
-                    return True
-                return False
-            except TravisCIError as exception:
-                if (
-                    "Accepted" in exception.error_message()
-                    or "build_not_cancelable" in exception.error_type()
-                ):
-                    return True
-                raise exception
-        return None
-
-    def restart(self):
-        """
-        Restarts a build that has completed or been canceled.
-
-        :return:
-            A boolean if the request was made and :code:`None` if
-            the state of the build is :code:`created` or :code:`started`.
-
-        :rtype: bool,None
-        :raise TravisCIError:
-            When something went wrong while communicating,
-            getting or extracting data from or with the API.
-        """
-
-        if self.state not in StatesConfig.PROCESSING:
-            self._endpoint_url = self.bind_path_name_to_access_point(
-                self.___standard_enpoint_url, "restart"
-            )
-
-            try:
-                response = self.post_request()
-
-                if "build" in response and "id" in response["build"]:
-                    self.response_to_attribute(
-                        self, self.standardize.it(response["build"])
-                    )
-                    return True
-                return False
-            except TravisCIError as exception:
-                if "Accepted" in exception.error_message():
-                    return True
-                raise exception
-        return None
+        return comm.restart(build_id=self.id)

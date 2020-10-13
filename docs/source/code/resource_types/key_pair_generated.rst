@@ -1,6 +1,6 @@
-Key pair (generated)
-====================
+Key pair (Generated)
+--------------------
 
 .. automodule:: PyTravisCI.resource_types.key_pair_generated
    :members:
-   :private-members:
+   :show-inheritance:

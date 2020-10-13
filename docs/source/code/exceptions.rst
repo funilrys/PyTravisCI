@@ -1,5 +1,5 @@
 Exceptions
-=============
+==========
 
 .. automodule:: PyTravisCI.exceptions
    :members:

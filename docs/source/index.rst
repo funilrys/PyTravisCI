@@ -1,4 +1,4 @@
-PyTravisCI - Just another Travis CI (Python) API client.
+PyTravisCI - Just another Travis CI (API) Python interface.
 ========================================================
 
 .. image:: https://travis-ci.com/funilrys/PyTravisCI.svg?branch=master
@@ -15,10 +15,10 @@ PyTravisCI is just another Travis CI API client for Python.
 It has been meant to fit my needs but I hope that it will be useful to others.
 
 It can only communicate and interpret outputs of the `V3 of the Travis API`_
-and was meant to be used as an imported module than something else.
+and was meant to be used as an imported module rather through a CLI.
 
 It has nothing to do with `the ruby version of the Travis client`_ and
-will never have similarities
+may never have similarities
 (except maybe if one develops a CLI out of this) with it.
 
 
@@ -32,49 +32,26 @@ will never have similarities
    history
    installation
    update
-   usage
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Usage
+
+   usage/index
 
 .. toctree::
    :maxdepth: 2
    :caption: Code Documentation
 
    code/api
-   code/communication
-   code/configuration
-   code/encryption
+   code/resource_types/index
+   code/encryption/index
+
    code/exceptions
-   code/standardize
+   code/standardization
+   code/requester
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Resource Types Documentation
-
-   code/resource_types/todo
-   code/resource_types/not_implemented
-   code/resource_types/development
-   code/resource_types/active
-   code/resource_types/branch
-   code/resource_types/branches
-   code/resource_types/broadcasts
-   code/resource_types/build
-   code/resource_types/builds
-   code/resource_types/caches
-   code/resource_types/cron
-   code/resource_types/crons
-   code/resource_types/env_var
-   code/resource_types/env_vars
-   code/resource_types/job
-   code/resource_types/jobs
-   code/resource_types/key_pair_generated
-   code/resource_types/log
-   code/resource_types/organization
-   code/resource_types/organizations
-   code/resource_types/owner
-   code/resource_types/repositories
-   code/resource_types/repository
-   code/resource_types/setting
-   code/resource_types/settings
-   code/resource_types/user
+   code/communicator/index
 
 
 Indices and tables

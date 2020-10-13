@@ -139,7 +139,9 @@ disable=print-statement,
         deprecated-sys-function,
         exception-escape,
         comprehension-escape,
-        bad-continuation
+        bad-continuation,
+        cyclic-import,
+        abstract-method
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -472,7 +474,7 @@ ignore-docstrings=yes
 ignore-imports=no
 
 # Minimum lines number of a similarity.
-min-similarity-lines=30
+min-similarity-lines=1000
 
 
 [IMPORTS]

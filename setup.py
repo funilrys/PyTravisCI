@@ -1,5 +1,5 @@
 """
-Just another Travis CI (Python) API client.
+Just another Travis CI (API) Python interface.
 
 Author
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
@@ -34,10 +34,10 @@ License
         SOFTWARE.
 """
 
-from re import compile as comp
+import re
 from unittest import TestLoader
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 PACKAGE_NAME = "PyTravisCI"
 
@@ -69,12 +69,10 @@ def get_version():
     Extract the version from {PACKAGE_NAME}/__init__.py
     """
 
-    to_match = comp(r'VERSION\s=\s"(.*)"\n')
+    to_match = re.compile(r'__version__\s+=\s+"(.*)"')
 
-    with open(f"{PACKAGE_NAME}/__init__.py", encoding="utf-8") as file_stream:
-        extracted = to_match.findall(file_stream.read())[0]
-
-    return ".".join([x for x in extracted.split(".") if x.isdigit()])
+    with open(f"{PACKAGE_NAME}/__about__.py", encoding="utf-8") as file_stream:
+        return to_match.findall(file_stream.read())[0]
 
 
 def get_long_description():
@@ -82,7 +80,8 @@ def get_long_description():
     Extract the long description from README.rst.
     """
 
-    return open("README.rst", encoding="utf-8").read()
+    with open("README.rst", encoding="utf-8") as file_stream:
+        return file_stream.read()
 
 
 if __name__ == "__main__":
@@ -91,18 +90,14 @@ if __name__ == "__main__":
         version=get_version(),
         python_requires=">=3.6, <4",
         install_requires=get_requirements(),
-        description="Just another Travis CI (Python) API client.",
+        description="Just another Travis CI (API) Python interface.",
         long_description=get_long_description(),
         author="funilrys",
         author_email="contact@funilrys.com",
         license="MIT",
         url="https://github.com/funilrys/PyTravisCI",
         platforms=["any"],
-        packages=[
-            PACKAGE_NAME,
-            f"{PACKAGE_NAME}.resource_types",
-            f"{PACKAGE_NAME}.helpers",
-        ],
+        packages=find_packages(exclude=("*.tests", "*.tests.*", "tests.*", "tests")),
         keywords=["Travis CI", "Travis", "CI", "API"],
         classifiers=[
             "Environment :: Console",
@@ -111,6 +106,7 @@ if __name__ == "__main__":
             "Intended Audience :: Developers",
             "Programming Language :: Python",
             "Programming Language :: Python :: 3",
+            "License :: OSI Approved",
             "License :: OSI Approved :: MIT License",
         ],
         test_suite="setup.test_suite",

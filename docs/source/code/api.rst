@@ -1,6 +1,6 @@
 API
 ===
 
-.. automodule:: PyTravisCI
+.. automodule:: PyTravisCI.travis_ci
    :members:
    :private-members:

@@ -1,136 +1,182 @@
 """
-Just another Travis CI (Python) API client.
+Just another Travis CI (API) Python interface.
 
-Provide the access to the user resource type.
+A module which provides the "User" resource type.
 
-Author
+Author:
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
 
-Project link
+Project link:
     https://github.com/funilrys/PyTravisCI
 
+Project documentation:
+    https://pytravisci.readthedocs.io/en/latest/
+
 License
-    ::
+::
 
 
-        MIT License
+    MIT License
 
-        Copyright (c) 2019 Nissar Chababy
+    Copyright (c) 2019, 2020 Nissar Chababy
 
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 """
-from ..communication import Communication
-from ..exceptions import InvalidIntArgument, MissingArgument
+
+from datetime import datetime
+from typing import List, Optional
+
+import PyTravisCI.communicator._all as communicator
+from PyTravisCI.resource_types import _all as resource_types
+
+# from . import _all as resource_types
+from .base import ResourceTypesBase
 
 
-class User(Communication):
+class User(ResourceTypesBase):
     """
-    Provide the information of a given :code:`user_id`.
+    Provides the information of a user.
 
-    Official Travis CI API documentation
-        - https://developer.travis-ci.org/resource/setting#setting
-        - https://developer.travis-ci.org/resource/setting#find
-        - https://developer.travis-ci.org/resource/setting#update
+    Official Travis CI API documentation:
+        - https://developer.travis-ci.org/resource/user
 
-    :param root:
-        An initiated instance of :class:`~PyTravisCI.TravisCI`.
-    :type root: :class:`~PyTravisCI.TravisCI`
-    :param user_id:
-        A user ID.
-
-        Can be
-            :code:`{user.id}`
-                Value uniquely identifying the user.
-    :type user_id: str,int
-
-    :ivar int id: Value uniquely identifying the user.
-    :ivar str login: Login set on Github.
-    :ivar str name: Name set on GitHub.
-    :ivar int github_id: Id set on GitHub.
-    :ivar str avatar_url: Avatar URL set on GitHub.
-    :ivar bool education: Whether or not the user has an education account.
-    :ivar bool allow_migration: The user's allow_migration.
-    :ivar bool is_syncing: Whether or not the user is currently being synced with Github.
-    :ivar synced_at: The last time the user was synced with GitHub.
-    :vartype synced_at: :class:`~datetime.datetime`
-
-
-    :raise InvalidIntArgument:
-        When :code:`user_id` is not an :code:`int` or :code:`str.isdigit`.
-    :raise TravisCIError:
-        When something went wrong while communicating,
-        getting or extracting data from or with the API.
+    :ivar int id:
+        Value uniquely identifying the user.
+    :ivar str login:
+        Login set on Github.
+    :ivar str name:
+        Name set on GitHub.
+    :ivar int github_id:
+        Id set on GitHub.
+    :ivar vcs_id:
+        The user's vcs_id.
+    :ivar vcs_type:
+        The user's vcs_type.
+    :ivar str avatar_url:
+        Avatar URL set on GitHub.
+    :ivar bool education:
+        Whether or not the user has an education account.
+    :ivar allow_migration:
+        The user's allow_migration.
+    :ivar str email:
+        The user's email.
+    :ivar bool is_syncing:
+        Whether or not the user is currently being synced with Github.
+    :ivar synced_at:
+        The last time the user was synced with GitHub.
+    :vartype synced_at: :py:class:`~datetime.datetime`
+    :ivar recently_signed_up:
+        The user's recently_signed_up.
+    :ivar secure_user_hash:
+        The user's secure_user_hash.
+    :ivar repositories:
+        Repositories belonging to this user.
+    :vartype repositories: List[:class:`~PyTravisCI.resource_types.repository.Repository`]
+    :ivar installation:
+        Installation belonging to the user.
+    :vartype installation: :class:`~PyTravisCI.resource_types.installation.Installation`
+    :ivar emails:
+        The user's emails.
     """
 
-    __path_name_base__ = "user"
+    id: Optional[int] = None
+    login: Optional[str] = None
+    name: Optional[str] = None
+    github_id: Optional[int] = None
+    vcs_id = None
+    vcs_type = None
+    avatar_url: Optional[str] = None
+    education: Optional[bool] = None
+    allow_migration = None
+    email = None
+    is_syncing: Optional[bool] = None
+    synced_at: Optional[datetime] = None
+    recently_signed_up = None
+    secure_user_hash = None
+    repositories: Optional[List["resource_types.Repository"]] = None
+    installation: Optional["resource_types.Installation"] = None
+    email = None
 
-    def __init__(self, root, user_id=None):
-        super(User, self).__init__(root)
+    def __init__(self, **kwargs) -> None:
+        if "repositories" in kwargs:
+            kwargs["repositories"] = [
+                resource_types.Repository(**x) for x in kwargs["repositories"]
+            ]
 
-        if user_id and not self.is_digit(user_id):
-            raise InvalidIntArgument("user_id")
-
-        self.__standard_endpoint_url = self.bind_path_name_to_access_point(
-            self.access_point, f"{self.__path_name_base__}"
-        )
-
-        if user_id:
-            self._endpoint_url = self.bind_path_name_to_access_point(
-                self.__standard_endpoint_url, user_id
-            )
-        else:
-            self._endpoint_url = self.__standard_endpoint_url
-
-        self.response_to_attribute(
-            self, self.standardize.it(self.get_request(follow_next_page=False))
-        )
-
-    def sync(self):
-        """
-        Triggers a sync on a user's account with their GitHub account.
-
-         :return:
-            A boolean if the request was made and :code:`None` if :code:`is_syncing`
-            is set to :code:`True`.
-
-        :rtype: bool,None
-
-        :raise MissingArgument:
-            When :code:`self.id` is not found.
-        :raise TravisCIError:
-            When something went wrong while communicating,
-            getting or extracting data from or with the API.
-        """
-
-        if not self.is_syncing:
-            if not self.id:
-                raise MissingArgument("self.id")
-
-            self._endpoint_url = self.bind_path_name_to_access_point(
-                self.__standard_endpoint_url, f"{self.id}/sync"
+        if "installation" in kwargs:
+            kwargs["installation"] = resource_types.Installation(
+                **kwargs["installation"]
             )
 
-            response = self.post_request()
+        super().__init__(**kwargs)
 
-            if "id" in response and "login" in response and "github_id" in response:
-                self.response_to_attribute(self, self.standardize.it(response))
+    def synchronize(self, *, params: Optional[dict] = None) -> bool:
+        """
+        Triggers a synchronization between Travis CI and
+        the user Github account.
 
-                return True
-            return False
-        return None
+        Official Travis CI API documentation:
+            - https://developer.travis-ci.org/resource/user
+
+        :param params:
+            The query parameters to append to the URL.
+        """
+
+        comm = getattr(communicator, self.__class__.__name__)(
+            self._PyTravisCI["com"]["requester"]
+        )
+
+        self.__dict__ = comm.synchronize(user_id=self.id, parameters=params).__dict__
+
+        return self
+
+    def get_active(self, *, params: Optional[dict] = None) -> "resource_types.Active":
+        """
+        Provides the list of active builds of the
+        current user.
+
+        Official Travis CI API documentation:
+            - https://developer.travis-ci.org/resource/active
+
+        :param params:
+            The query parameters to append to the URL.
+        """
+
+        comm = getattr(communicator, "Active")(self._PyTravisCI["com"]["requester"])
+
+        return comm.from_github_id(github_id=self.github_id, parameters=params)
+
+    def get_beta_features(
+        self, *, params: Optional[dict] = None
+    ) -> "resource_types.BetaFeatures":
+        """
+        Provides the list of beta features of the current user.
+
+        Official Travis CI API documentation:
+            - https://developer.travis-ci.org/resource/beta_features
+
+        :param params:
+            The query parameters to append to the URL.
+        """
+
+        comm = getattr(communicator, "BetaFeatures")(
+            self._PyTravisCI["com"]["requester"]
+        )
+
+        return comm.from_user_id(user_id=self.id, parameters=params)

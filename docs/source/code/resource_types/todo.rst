@@ -1,4 +1,0 @@
-ToDo List
-=========
-
-.. todolist::
