@@ -237,6 +237,37 @@ class ResourceTypesBase:
 
         return self.to_dict(remove_tags=remove_tags)
 
+    @classmethod
+    def __format_to_dict(cls, data: Any, *, remove_tags: bool = False) -> Any:
+        """
+        A helper for the dict convertion.
+
+        :param data:
+            The data to work with.
+        """
+
+        if isinstance(data, list):
+            return [cls.__format_to_dict(x) for x in data]
+
+        if isinstance(data, dict):
+            result = dict()
+
+            for key, value in data.items():
+                if remove_tags and key.startswith("_at_"):
+                    continue
+
+                if key.startswith("_PyTravisCI"):
+                    continue
+
+                if key.startswith("_at_"):
+                    key = key.replace("_at_", "@")
+
+                result[key] = cls.__format_to_dict(value)
+
+            return result
+
+        return data
+
     def to_dict(self, *, remove_tags: bool = False) -> dict:
         """
         Converts the current object to dict.
@@ -248,15 +279,9 @@ class ResourceTypesBase:
 
         result = {}
 
-        our_keys = ["_PyTravisCI"]
-
-        for key, value in self.__dict__.items():
-            if (remove_tags and key.startswith("_at_")) or key in our_keys:
-                continue
-
-            if key.startswith("_at_"):
-                key = key.replace("_at_", "@")
-
+        for key, value in self.__format_to_dict(
+            self.__dict__, remove_tags=remove_tags
+        ).items():
             if isinstance(value, ResourceTypesBase):
                 result[key] = value.to_dict(remove_tags=remove_tags)
             elif isinstance(value, list):

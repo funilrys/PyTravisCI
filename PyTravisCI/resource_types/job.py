@@ -150,6 +150,97 @@ class Job(ResourceTypesBase):
 
         return self
 
+    def is_canceled(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the job canceled.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.CANCELED
+
+    def is_errored(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the job errored.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.ERRORED
+
+    def is_failed(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the job failed.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.FAILED
+
+    def is_created(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the job is created.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.CREATED
+
+    def is_started(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the job is started.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.STARTED
+
+    def is_passed(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the job is passed.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.PASSED
+
+    def is_active(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the jpb is active.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() in defaults.states.ACTIVE
+
     def get_log(self, *, params: Optional[dict] = None) -> "resource_types.Log":
         """
         Provides the logs of the current job.
@@ -167,7 +258,7 @@ class Job(ResourceTypesBase):
         Cancels the current job.
         """
 
-        if self.state.lower() in defaults.states.STOPPED + defaults.states.FINISHED:
+        if not self.is_active():
             raise exceptions.JobAlreadyStopped()
 
         comm = getattr(communicator, self.__class__.__name__)(
@@ -180,16 +271,11 @@ class Job(ResourceTypesBase):
         """
         Restarts the current job.
 
-        :param force:
-            Force the restart by cancelling first.
-        :param wait_until_started:
-            Whether we wait until we are sure that the job is started.
-
         :raise JobAlreadyStarted:
             When the current job was already started.
         """
 
-        if self.state.lower() in defaults.states.ACTIVE:
+        if self.is_active():
             raise exceptions.JobAlreadyStarted()
 
         comm = getattr(communicator, self.__class__.__name__)(

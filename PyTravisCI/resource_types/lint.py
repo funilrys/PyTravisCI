@@ -39,7 +39,7 @@ License
     SOFTWARE.
 """
 
-from typing import Optional
+from typing import List, Optional
 
 from . import _all as resource_types  # pylint: disable=unused-import
 from .base import ResourceTypesBase
@@ -62,10 +62,16 @@ class Lint(ResourceTypesBase):
         An array of hashes with keys and warnings.
     """
 
-    warnings: Optional[LintWarning] = None
+    __iter_through__: str = "warnings"
+    warnings: Optional[List[LintWarning]] = []
 
     def __init__(self, **kwargs) -> None:
         if "warnings" in kwargs:
             kwargs["warnings"] = [LintWarning(**x) for x in kwargs["warnings"]]
+
+        if "_at_warnings" in kwargs:
+            kwargs["warnings"].extend(
+                [LintWarning(**x) for x in kwargs["_at_warnings"]]
+            )
 
         super().__init__(**kwargs)

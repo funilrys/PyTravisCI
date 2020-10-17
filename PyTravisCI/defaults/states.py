@@ -39,29 +39,37 @@ License
     SOFTWARE.
 """
 
-STOPPED = ["canceled", "errored", "failed"]
+CANCELED = "canceled"
 """
-Provides the list of states which we use to consider a job/build as stopped.
+Provides the states which we use to consider a job/build as canceled.
 """
 
-ACTIVE = ["created", "started"]
+ERRORED = "errored"
+"""
+Provides the state which we use to consider a job/build as errored.
+"""
+
+FAILED = "failed"
+"""
+Provides the state which we use to consider a job/build as failed.
+"""
+
+CREATED = "created"
+"""
+Provides the state which we use to consider a job/build as created.
+"""
+
+STARTED = "started"
+"""
+Provides the state which we use to consider a job/build as started.
+"""
+
+PASSED = "passed"
+"""
+Provides the state which we use to consider a job/build as passed.
+"""
+
+ACTIVE = [CREATED, STARTED]
 """
 Provides the list of states which we use to consider a job/build or job as processing.
-"""
-
-FINISHED = ["passed"]
-"""
-Provides the list of states which we use to consider a job/build as done.
-"""
-
-NOT_STARTED = FINISHED + ACTIVE
-"""
-Provides the list of states which we use to consider a job/build
-as not started.
-"""
-
-NOT_CANCELLED = ACTIVE
-"""
-Provides the list of states which we use to consider a build as
-not cancelled.
 """

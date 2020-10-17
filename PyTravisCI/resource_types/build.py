@@ -169,6 +169,97 @@ class Build(ResourceTypesBase):
 
         return self
 
+    def is_canceled(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the build canceled.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.CANCELED
+
+    def is_errored(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the build errored.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.ERRORED
+
+    def is_failed(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the build failed.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.FAILED
+
+    def is_created(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the build is created.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.CREATED
+
+    def is_started(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the build is started.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.STARTED
+
+    def is_passed(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the build is passed.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() == defaults.states.PASSED
+
+    def is_active(self, *, sync: bool = False) -> bool:
+        """
+        Checks if the build is active.
+
+        :param sync:
+            Authorizes the synchronization before checking.
+        """
+
+        if sync:
+            self.sync()
+
+        return self.state.lower() in defaults.states.ACTIVE
+
     def get_jobs(self, *, params: Optional[dict] = None) -> "resource_types.Jobs":
         """
         Provides the list of jobs of the current build
@@ -202,12 +293,12 @@ class Build(ResourceTypesBase):
     def cancel(self) -> "resource_types.Build":
         """
         Cancels the current build.
+
+        :raise BuildAlreadyStopped:
+            When the current build was already canceled.
         """
 
-        if (
-            self.state.lower() in defaults.states.STOPPED
-            or self.state.lower() in defaults.states.FINISHED
-        ):
+        if not self.is_active():
             raise exceptions.BuildAlreadyStopped()
 
         comm = getattr(communicator, self.__class__.__name__)(
@@ -219,9 +310,12 @@ class Build(ResourceTypesBase):
     def restart(self) -> "resource_types.Build":
         """
         Restarts the current build.
+
+        :raise BuildAlreadyStarted:
+            When the current build was already started.
         """
 
-        if self.state.lower() in defaults.states.ACTIVE:
+        if self.is_active():
             raise exceptions.BuildAlreadyStarted()
 
         comm = getattr(communicator, self.__class__.__name__)(
