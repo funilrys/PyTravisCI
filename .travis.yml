@@ -1,12 +1,85 @@
 env:
-  matrix:
-    - PYTHON_VERSION="3.6.8"
-    - PYTHON_VERSION="3.7.3"
   global:
     - secure: yymikcfFTbyLj/+K9a8gjC/3e3sARM8fVCGRR8yW/9sJVshIqxWKjA1eKMjecmgfrF01fYocRDQDNSB0fBWYFUx2KQnsrxHWjF2MXyCZ1WfF065InFniigPvuMAz7dxZCQzJmn9Ggv09X4/+3O/biAqQduj+M9eYk7oV01fFACmI/IYJou9myN8Lv+CwkhUL+Yd6G7zUP9Aa/RpUyQ+HdYCsP2n0IUWvOTdnwqspMpuEQthdbZZ8wOVqY/KStcLVu33kaT7+4Z3SJsGFkBR9PXh+cP1lECOvdAFOA9ZFRV/pbdnIrG2HLL7pS0s57e+eQ62qVxw2arYMz/8IRLM9IUZOsRXK0MyFSe8T1mNqMQzwvORTfpTD6FNpfDOiYiGdL06GJ3h5YYCNrABbEC5DVR/zxqAyiun7tDnlNd8pvJ3j94JnWdFX/w14eUUEok1vijeOEF2Lrd0Cq5+kD7cyvaeeFA18P6/DYDhMf3eiS7b/PmOYA9TSRI5FoMl+EnAdkB2wOh9Y6CNMDNwOA/EuEeX5WjOxw8i+dpMQTrVEzEA7dJFn3yVy8+Cswtl5EqHjWjJx1IMfG2R5iUQz2YxOzfPRu+jEYttOpJdEUJQqNm8WotSnwIlTZCA0QxGETHWPsiiN4CitQWxImTUzbiq2pZ6399nFbGcAlsvj7BjqLxI=
 
-language: generic
-sudo: false
+jobs:
+  include:
+    - stage: "Code Tests"
+      language: generic
+      os: linux
+      dist: bionic
+      name: "Code Test with Python 3.8.5 under Ubuntu 18.04 (Bionic Beaver)"
+      env:
+        - PYTHON_VERSION="3.8.5"
+        - TOXENV="py38"
+      script:
+        - tox --current-env
+    - language: generic
+      os: osx
+      osx_image: xcode12
+      name: "Code Test with Python 3.8.5 under macOS 10.14 (Mojave)"
+      env:
+        - PYTHON_VERSION="3.8.5"
+        - TOXENV="py38"
+      script:
+        - tox --current-env
+    - language: generic
+      os: linux
+      dist: bionic
+      name: "Code Test with Python 3.7.8 under Ubuntu 18.04 (Bionic Beaver)"
+      env:
+        - PYTHON_VERSION="3.7.8"
+        - TOXENV="py37"
+      script:
+        - tox --current-env
+    - language: generic
+      os: osx
+      osx_image: xcode12
+      name: "Code Test with Python 3.7.8 under macOS 10.14 (Mojave)"
+      env:
+        - PYTHON_VERSION="3.7.8"
+        - TOXENV="py37"
+      script:
+        - tox --current-env
+    - language: generic
+      os: linux
+      dist: bionic
+      name: "Code Test with Python 3.6.11 under Ubuntu 18.04 (Bionic Beaver)"
+      env:
+        - PYTHON_VERSION="3.6.11"
+        - TOXENV="py36"
+      script:
+        - tox --current-env
+    - language: generic
+      os: osx
+      osx_image: xcode12
+      name: "Code Test with Python 3.6.11 under macOS 10.14 (Mojave)"
+      env:
+        - PYTHON_VERSION="3.6.11"
+        - TOXENV="py37"
+      script:
+        - tox --current-env
+    - stage: "Deployments"
+      if: branch =~ ^master$
+      os: linux
+      dist: bionic
+      name: "Deployment to PyPi"
+      script:
+        - echo "Hello, World!"
+      after_success:
+        - echo "Hello, World!"
+      env:
+        - PYTHON_VERSION="3.8.5"
+      deploy:
+        provider: pypi
+        user: funilrys
+        password:
+          secure: oL00HUYS0dzCfQ1kZtS0EDM9JyCdH2asZb8tCngrsgcavwakqpcnNgRghG3nkU61ongRbt4VTzFSC8L4GVsnxEYaluJdNt81EanFPk3OXzbvZbhnUfvYs09WBT5NrhK2udLZv/K4ALKQ2WfJVJlMnPpG5xW+V5dHWPHnWeD5Kaq2y4C6GdlfLHD+W4G8AGRxwis+umvyCqofiZ7DIqfGIET2pKyIAE0SOlIBwSJRBhytNTLBWLdGlir8S6HNv5sDXcCq3i4alz6wMuZAN0fWUIhkN+MF+RZcEZxlV4RT6h3rFZ2dacBu2fam8mtl6IdyiwXJ6O2KkYF7Pkwi/ygkXAzQYUeAqgJfcu15Bhn6j3yCTr60RxWCvja6coY5dz3BIAbPWdMAyxGJNvswysZK5m/GJGCJ//jdRGhZoDzcEGm5mCN8CHTJTlHIoKva2VrSZUeJQAFnpY16o2WhI6r5S5YlHAedns+N0mBL1n9t9FDwwQqP6p8SXWBtDLW+XbqIEyMOEvQiRT3h6pd/5w5Zo5ua1nFqRJ90laxmXeOKYZvUSJy8ZHCevlZJNfkbLzuA8f4EiP0PLSUAQ1QUIqeJuICyJtTtDTHmoAuF/8Q7HVy/O1GaMKSczOwQcu5yePcJIVKt+PKT7L0VPWoxXzGKOtcyb2QaG+8DT7yQToOCkHU=
+        distributions: sdist bdist_wheel
+        skip_existing: true
+        on:
+          all_branches: true
+          condition: "${TRAVIS_BRANCH} =~ ^master$"
 
 os:
   - linux
@@ -21,35 +94,24 @@ install:
   - bash miniconda.sh -b -p ${HOME}/miniconda
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels conda-forge
   - conda update -q conda
   - conda create -q -n test-environment python="${PYTHON_VERSION}"
   - source activate test-environment
-  - python -VV
+  - python --version --version
   - pip --version
-  - pip install pylint coverage coveralls codacy-coverage pyyaml
-
-script:
-  - python setup.py install
-  - coverage run setup.py test
-  - coverage xml # Needed for codacy.
-  - echo "Lint PyTravisCI" && pylint PyTravisCI
-  - echo "Lint tests" && pylint tests/**/*.py
+  - conda --version
+  - conda install coverage coveralls conda-forge::codacy-coverage pylint unittest2
+  - pip install tox-current-env
+  - pip install -e .
 
 after_success:
   - python-codacy-coverage -r coverage.xml
   - coveralls
 
-deploy:
-  provider: pypi
-  user: funilrys
-  password:
-    secure: oL00HUYS0dzCfQ1kZtS0EDM9JyCdH2asZb8tCngrsgcavwakqpcnNgRghG3nkU61ongRbt4VTzFSC8L4GVsnxEYaluJdNt81EanFPk3OXzbvZbhnUfvYs09WBT5NrhK2udLZv/K4ALKQ2WfJVJlMnPpG5xW+V5dHWPHnWeD5Kaq2y4C6GdlfLHD+W4G8AGRxwis+umvyCqofiZ7DIqfGIET2pKyIAE0SOlIBwSJRBhytNTLBWLdGlir8S6HNv5sDXcCq3i4alz6wMuZAN0fWUIhkN+MF+RZcEZxlV4RT6h3rFZ2dacBu2fam8mtl6IdyiwXJ6O2KkYF7Pkwi/ygkXAzQYUeAqgJfcu15Bhn6j3yCTr60RxWCvja6coY5dz3BIAbPWdMAyxGJNvswysZK5m/GJGCJ//jdRGhZoDzcEGm5mCN8CHTJTlHIoKva2VrSZUeJQAFnpY16o2WhI6r5S5YlHAedns+N0mBL1n9t9FDwwQqP6p8SXWBtDLW+XbqIEyMOEvQiRT3h6pd/5w5Zo5ua1nFqRJ90laxmXeOKYZvUSJy8ZHCevlZJNfkbLzuA8f4EiP0PLSUAQ1QUIqeJuICyJtTtDTHmoAuF/8Q7HVy/O1GaMKSczOwQcu5yePcJIVKt+PKT7L0VPWoxXzGKOtcyb2QaG+8DT7yQToOCkHU=
-  distributions: sdist bdist_wheel
-  skip_existing: true
-  on:
-    all_branches: true
-    condition: "${TRAVIS_BRANCH} =~ ^dev|master$"
-
 notifications:
-  on_success: change
-  on_failure: always
+  email:
+    on_failure: always
+    on_success: change
+    recipients:
+      - funilrys@outlook.com
