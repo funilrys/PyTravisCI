@@ -1,7 +1,7 @@
-Lint
+Log
 ----
 
-.. automodule:: PyTravisCI.communicator.lint
+.. automodule:: PyTravisCI.communicator.log
    :members:
    :show-inheritance:
    :undoc-members:
