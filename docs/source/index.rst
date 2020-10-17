@@ -28,6 +28,7 @@ PyTravisCI - Just another Travis CI (API) Python interface
 .. image:: https://pepy.tech/badge/PyTravisCI
     :target: https://pepy.tech/project/PyTravisCI
 
+---------------
 
 Just another Travis CI (API) Python interface.
 It has been meant to fit my needs but in hope that it will be useful to others.
