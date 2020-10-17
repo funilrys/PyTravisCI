@@ -39,7 +39,7 @@ License
     SOFTWARE.
 """
 
-
+import copy
 from typing import Union
 
 from .base import CommunicatorBase
@@ -92,7 +92,7 @@ class Cron(CommunicatorBase):
         data = None
 
         if "data" in kwargs:
-            data = kwargs["data"].copy()
+            data = copy.deepcopy(kwargs["data"])
 
             del kwargs["data"]
 

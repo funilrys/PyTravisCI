@@ -1,18 +1,13 @@
 [run]
 branch = False
 
-omit =
-    # omit the following directory
-    */pbr/*
-    */site-packages/*
-    /home/travis/virtualenv/*
-    *.eggs/*
-    */distutils/*
-    */resource_types/*
+source =
+    PyTravisCI.encryption
+    PyTravisCI.requerster
+    PyTravisCI.standardization
+    PyTravisCI.resource_types.base
+    PyTravisCI.communicator.base
 
-    # omit the following file
-    PyTravisCI/__init__.py
-    PyTravisCI/exceptions.py
 
 [report]
 # This should be False one we move into production

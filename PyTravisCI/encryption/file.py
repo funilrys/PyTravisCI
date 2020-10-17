@@ -73,7 +73,7 @@ class FileEncryption:
         self,
         *,
         key: Optional[Union[str, bytes]] = None,
-        iv: Optional[Union[str, bytes]] = None
+        iv: Optional[Union[str, bytes]] = None,
     ):
         if key:
             self.set_key(key)
@@ -120,6 +120,9 @@ class FileEncryption:
     def set_key(self, value: Union[str, bytes]) -> None:
         """
         Sets the Key to use.
+
+        :raise ValueError:
+            When the size of the given key is not correct.
         """
 
         if not isinstance(value, bytes):
@@ -127,15 +130,28 @@ class FileEncryption:
         else:
             self.key = value
 
+        if len(self.key) != self.KEY_SIZE:
+            raise ValueError(
+                f"<value> should have a length of {self.KEY_SIZE}, {len(self.key)} given."
+            )
+
     def set_iv(self, value: Union[str, bytes]) -> None:
         """
         Sets the IV to use.
+
+        :raise ValueError:
+            When the size of the given key is not correct.
         """
 
         if not isinstance(value, bytes):
             self.iv = value.encode()
         else:
             self.iv = value
+
+        if len(self.iv) != self.IV_SIZE:
+            raise ValueError(
+                f"<value> should have a length of {self.IV_SIZE}, {len(self.iv)} given."
+            )
 
     def get_key(self) -> Optional[bytes]:
         """
@@ -220,7 +236,7 @@ class FileEncryption:
         return encryptor.update(padded_file_content) + encryptor.finalize()
 
     @decrypt_ensure_keys_exists
-    def decrypt_file_content(self, encrypted_file_content: Union[str, bytes]) -> bytes:
+    def decrypt_file_content(self, encrypted_file_content: bytes) -> bytes:
         """
         Decrypts the given encrypted "file content". Take it as the equivalent of:
 
@@ -231,10 +247,15 @@ class FileEncryption:
             super_secret.txt -d
 
         but in Python :-)
+
+        :raise ValueError:
+            When :code:`encrypted_file_content` is not a :py:class:`bytes`.
         """
 
         if not isinstance(encrypted_file_content, bytes):
-            encrypted_file_content = encrypted_file_content.encode()
+            raise ValueError(
+                f"<encrypted_file_content> must be {bytes}, {type(encrypted_file_content)} given."
+            )
 
         decryptor = self.__get_cipher().decryptor()
         decrypted = decryptor.update(encrypted_file_content) + decryptor.finalize()

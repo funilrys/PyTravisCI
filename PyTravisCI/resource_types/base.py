@@ -55,7 +55,7 @@ class ComplexJsonEncoder(json.JSONEncoder):
     Provides ours complex JSON encoder.
     """
 
-    def default(self, o: Any):
+    def default(self, o: Any):  # pragma: no cover
         """
         Implements our complex conversion to JSON.
         """
@@ -108,10 +108,12 @@ class ResourceTypesBase:
         return f"<{self.__class__.__name__} {self.__dict__} />"
 
     def __setattr__(self, name: str, value: Any) -> None:
+
         if (
-            name.startswith("_PyTravisCI")
+            name == "__dict__"
+            or name.startswith("_PyTravisCI")
             or name.startswith(f"_{__class__.__name__}")
-            or name == "__dict__"
+            or name.startswith(f"_{self.__class__.__name__}")
         ):
             super().__setattr__(name, value)
         else:
@@ -138,7 +140,7 @@ class ResourceTypesBase:
         raise NotImplementedError()
 
     def __ne__(self, other):
-        raise NotImplementedError()
+        return not self == other
 
     def __gt__(self, other):
         raise NotImplementedError()
@@ -186,7 +188,7 @@ class ResourceTypesBase:
 
         return self._at_pagination["last"]["_at_href"]
 
-    def __get_href(self) -> Optional[str]:
+    def __get_href(self) -> Optional[str]:  # pragma: no cover
         """
         Provides the href of the current object.
         """
@@ -194,12 +196,13 @@ class ResourceTypesBase:
         return self._at_href
 
     @staticmethod
-    def _get_resource_type_module() -> str:
+    def _get_resource_type_module() -> str:  # pragma: no cover
         """
         Provides the resource type module of the current class.
         """
 
-        from . import _all as resource_types  # pylint: disable=import-outside-toplevel
+        # pylint: disable=import-outside-toplevel
+        from . import _all as resource_types
 
         return resource_types
 
@@ -332,7 +335,7 @@ class ResourceTypesBase:
         )
 
     @CommunicatorBase.complete_response
-    def next_page(self) -> Optional["ResourceTypesBase"]:
+    def next_page(self) -> Optional["ResourceTypesBase"]:  # pragma: no cover
         """
         Provides the next page.
 
@@ -356,7 +359,7 @@ class ResourceTypesBase:
         raise exceptions.NextPageNotFound()
 
     @CommunicatorBase.complete_response
-    def previous_page(self) -> Optional["ResourceTypesBase"]:
+    def previous_page(self) -> Optional["ResourceTypesBase"]:  # pragma: no cover
         """
         Provides the previous page.
 
@@ -380,7 +383,7 @@ class ResourceTypesBase:
         raise exceptions.PreviousPageNotFound()
 
     @CommunicatorBase.complete_response
-    def first_page(self) -> Optional["ResourceTypesBase"]:
+    def first_page(self) -> Optional["ResourceTypesBase"]:  # pragma: no cover
         """
         Provides the first page.
 
@@ -404,7 +407,7 @@ class ResourceTypesBase:
         raise exceptions.FirstPageNotFound()
 
     @CommunicatorBase.complete_response
-    def last_page(self) -> Optional["ResourceTypesBase"]:
+    def last_page(self) -> Optional["ResourceTypesBase"]:  # pragma: no cover
         """
         Provides the last page.
 
@@ -428,7 +431,7 @@ class ResourceTypesBase:
         raise exceptions.LastPageNotFound()
 
     @CommunicatorBase.complete_response
-    def get_complete(self) -> Optional["ResourceTypesBase"]:
+    def get_complete(self) -> Optional["ResourceTypesBase"]:  # pragma: no cover
         """
         Provides the complete representation if the current
         representation is the minimal one.

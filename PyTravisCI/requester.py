@@ -88,7 +88,7 @@ class Requester:
 
                     self.raise_if_error(req, response)
                 except json.decoder.JSONDecodeError:
-                    try:
+                    if req.text:
                         # pylint: disable=raise-missing-from
                         raise exceptions.TravisCIError(
                             req.url,
@@ -100,18 +100,18 @@ class Requester:
                                 "status_code": req.status_code,
                             },
                         )
-                    except IndexError:
-                        # pylint: disable=raise-missing-from
-                        raise exceptions.TravisCIError(
-                            req.url,
-                            req.text,
-                            req.text,
-                            response={
-                                "text": req.text,
-                                "headers": req.headers,
-                                "status_code": req.status_code,
-                            },
-                        )
+
+                    # pylint: disable=raise-missing-from
+                    raise exceptions.TravisCIError(
+                        req.url,
+                        req.text,
+                        req.text,
+                        response={
+                            "text": req.text,
+                            "headers": req.headers,
+                            "status_code": req.status_code,
+                        },
+                    )
 
                 return response
 
@@ -119,8 +119,8 @@ class Requester:
 
         return request_method
 
-    @classmethod
-    def is_error(cls, api_response: dict) -> bool:
+    @staticmethod
+    def is_error(api_response: dict) -> bool:
         """
         Checks if the API response is or contain an error as
         defined by the Travis CI API documentation.
@@ -132,6 +132,47 @@ class Requester:
             and api_response["@type"] == "error"
         )
 
+    @classmethod
+    def get_error_message(
+        cls, api_response: dict, *, already_checked: bool = False
+    ) -> Optional[str]:
+        """
+        Provides the error message.
+        """
+
+        is_error = True if already_checked else cls.is_error(api_response)
+
+        return api_response["error_message"] if is_error else None
+
+    @classmethod
+    def get_error_type(
+        cls, api_response: dict, *, already_checked: bool = False
+    ) -> Optional[str]:
+        """
+        Provides the error type.
+        """
+
+        is_error = True if already_checked else cls.is_error(api_response)
+
+        return api_response["error_type"] if is_error else None
+
+    @classmethod
+    def raise_if_error(cls, req: requests.Request, api_response: dict) -> None:
+        """
+        Raises a :py:class:`~PyTravisCI.exceptions.TravisCIError`
+        if the given API response contain an error.
+        """
+
+        is_error = cls.is_error(api_response)
+
+        if is_error:
+            raise exceptions.TravisCIError(
+                req.url,
+                cls.get_error_message(api_response, already_checked=True),
+                cls.get_error_type(api_response, already_checked=True),
+                response=api_response,
+            )
+
     def set_authorization(self, value: str) -> None:
         """
         Sets the authorization header.
@@ -141,7 +182,7 @@ class Requester:
         """
 
         if not isinstance(value, str):
-            raise TypeError(f"<value> should {str}. {type(value)} given.")
+            raise TypeError(f"<value> should be {str}. {type(value)} given.")
 
         self.session.headers["Authorization"] = f"token {value}"
 
@@ -154,7 +195,7 @@ class Requester:
         """
 
         if not isinstance(value, str):
-            raise TypeError(f"<value> should {str}. {type(value)} given.")
+            raise TypeError(f"<value> should be {str}. {type(value)} given.")
 
         if value.endswith("/"):
             self.base_url = value[:-1]
@@ -163,48 +204,13 @@ class Requester:
 
         logging.debug("Base URL set to: %s", self.base_url)
 
-    def get_error_message(
-        self, api_response: dict, *, already_checked: bool = False
-    ) -> Optional[str]:
-        """
-        Provides the error message.
-        """
-
-        is_error = True if already_checked else self.is_error(api_response)
-
-        return api_response["error_message"] if is_error else None
-
-    def get_error_type(
-        self, api_response: dict, *, already_checked: bool = False
-    ) -> Optional[str]:
-        """
-        Provides the error type.
-        """
-
-        is_error = True if already_checked else self.is_error(api_response)
-
-        return api_response["error_type"] if is_error else None
-
-    def raise_if_error(self, req: requests.Request, api_response: dict) -> None:
-        """
-        Raises a :py:class:`~PyTravisCI.exceptions.TravisCIError`
-        if the given API response contain an error.
-        """
-
-        is_error = self.is_error(api_response)
-
-        if is_error:
-            raise exceptions.TravisCIError(
-                req.url,
-                self.get_error_message(api_response, already_checked=True),
-                self.get_error_type(api_response, already_checked=True),
-                response=api_response,
-            )
-
     def bind_endpoint_to_base_url(self, endpoint: str) -> str:
         """
         Binds the endpoint with the base url.
         """
+
+        if not isinstance(endpoint, str):
+            raise TypeError(f"<endpoint> should be {str}, {type(endpoint)} given.")
 
         if not endpoint.startswith("/"):
             endpoint = f"/{endpoint}"

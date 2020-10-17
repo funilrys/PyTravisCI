@@ -53,6 +53,8 @@ class DataEncryption:
     Provides the interface for the encryption of information for or within the
     Travis CI infrastructure.
 
+    :param private_key:
+        The private key to use for encryption.
     :param public_key:
         The public key to use for encryption.
     """
@@ -63,10 +65,18 @@ class DataEncryption:
     private_key: Optional[bytes] = None
 
     # pylint: disable=protected-access
-    __loaded_public_key: Optional[rsa._RSAPublicKey] = None
-    __loaded_private_key: Optional[rsa._RSAPrivateKey] = None
+    _loaded_public_key: Optional[rsa._RSAPublicKey] = None
+    _loaded_private_key: Optional[rsa._RSAPrivateKey] = None
 
-    def __init__(self, public_key: Optional[Union[str, bytes]] = None):
+    def __init__(
+        self,
+        *,
+        private_key: Optional[Union[str, bytes]] = None,
+        public_key: Optional[Union[str, bytes]] = None,
+    ):
+        if private_key:
+            self.set_private_key(private_key)
+
         if public_key:
             self.set_public_key(public_key)
 
@@ -74,6 +84,9 @@ class DataEncryption:
     def encrypt_ensure_key_exists(func):
         """
         Ensures that the key needed for encryption exists.
+
+        :raise ValueError:
+            When the public key is not set/given.
         """
 
         def wrapper(self, *args, **kwargs):
@@ -89,6 +102,9 @@ class DataEncryption:
     def decrypt_ensure_key_exists(func):
         """
         Ensures that the key needed for encryption exists.
+
+        :raise ValueError:
+            When the private key is not set/given.
         """
 
         def wrapper(self, *args, **kwargs):
@@ -113,7 +129,7 @@ class DataEncryption:
         else:
             self.public_key = value
 
-        self.__loaded_public_key = serialization.load_pem_public_key(
+        self._loaded_public_key = serialization.load_pem_public_key(
             data=self.public_key, backend=default_backend()
         )
 
@@ -137,7 +153,7 @@ class DataEncryption:
         if password and not isinstance(password, bytes):
             password = password.encode()
 
-        self.__loaded_private_key = serialization.load_pem_private_key(
+        self._loaded_private_key = serialization.load_pem_private_key(
             self.private_key, password=password, backend=default_backend()
         )
 
@@ -161,6 +177,9 @@ class DataEncryption:
 
         :param name:
             The name of the padding to user.
+
+        :raise ValueError:
+            When :code:`name` is not supported.
         """
 
         if name.lower() not in self.__SUPPORTED_PADDING:
@@ -188,6 +207,8 @@ class DataEncryption:
             Accepted values:
                 - :code:`PKCS1v15`
                 - :code:`OAEP`
+        :raise ValueError:
+            When :code:`padd` is not supported.
         """
 
         if not isinstance(data, bytes):
@@ -195,10 +216,10 @@ class DataEncryption:
 
         padd = self.__get_padding_from_name(padd)
 
-        return self.__loaded_public_key.encrypt(data, padd)
+        return self._loaded_public_key.encrypt(data, padd)
 
     @decrypt_ensure_key_exists
-    def decrypt_data(self, data: Union[str, bytes], *, padd: str = "PKCS1v15") -> bytes:
+    def decrypt_data(self, data: bytes, *, padd: str = "PKCS1v15") -> bytes:
         """
         Process the decryption of the given data with the given padding.
 
@@ -210,11 +231,14 @@ class DataEncryption:
             Accepted values:
                 - :code:`PKCS1v15`
                 - :code:`OAEP`
+
+        :raise ValueError:
+            When :code:`data` is not a :py:class:`bytes`.
         """
 
         if not isinstance(data, bytes):
-            data = data.encode()
+            raise ValueError(f"<data> must be {bytes}, {type(data)} given.")
 
         padd = self.__get_padding_from_name(padd)
 
-        return self.__loaded_private_key.decrypt(data, padd)
+        return self._loaded_private_key.decrypt(data, padd)

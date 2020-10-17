@@ -39,6 +39,7 @@ License
     SOFTWARE.
 """
 
+import copy
 
 from .base import CommunicatorBase
 
@@ -80,7 +81,7 @@ class Setting(CommunicatorBase):
         data = None
 
         if "data" in kwargs:
-            data = kwargs["data"].copy()
+            data = copy.deepcopy(kwargs["data"])
 
             del kwargs["data"]
 

@@ -40,6 +40,7 @@ License
     SOFTWARE.
 """
 
+import copy
 from datetime import datetime
 from functools import wraps
 from typing import Any, Optional
@@ -80,7 +81,7 @@ class Standardization:
         @wraps(func)
         def wrapper(self):
 
-            result = self.data.copy()
+            result = copy.deepcopy(self.data)
 
             for method_name in dir(self):
                 if method_name.startswith("standardize_"):
@@ -91,7 +92,7 @@ class Standardization:
         return wrapper
 
     @run_standardization
-    def get_standized(self) -> dict:
+    def get_standardized(self) -> dict:
         """
         Provides the standardized version.
         """
@@ -117,7 +118,7 @@ class Standardization:
         if isinstance(data, dict):
             result = dict()
 
-            for key, value in data.copy().items():
+            for key, value in copy.deepcopy(data).items():
                 if (
                     value
                     and key in date_time_indexes
@@ -154,7 +155,7 @@ class Standardization:
         if isinstance(data, dict):
             result = dict()
 
-            for key, value in data.copy().items():
+            for key, value in copy.deepcopy(data).items():
                 result[key.replace("@", "_at_")] = self.standardize_at_tagged(value)
         elif isinstance(data, list):
             result = [self.standardize_at_tagged(x) for x in data]

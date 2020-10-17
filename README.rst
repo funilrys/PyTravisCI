@@ -37,22 +37,25 @@ Simply run the following and enjoy our documentation!
 
     $ cd docs/
     $ make html
-    $chromium _build/html/index.html # Chromium or whatever browser you use.
+    $ chromium _build/html/index.html # Chromium or whatever browser you use.
 
 .. _the documentation: https://pytravisci.readthedocs.io/en/latest/
 
 Why is there a lack of tests?
 -----------------------------
 
-If you read what I wrote previously, I said:
+Well, I don't know what you may call "lack" but I wrote tests for what I thought
+was important.
+
+But, if you read what I wrote previously, I said:
 
     It has been meant to fit my needs but I hope that it will be useful to others.
 
 which means that I use this project manually at least once a week and automated
 almost every day.
 
-It was not my priority to write the tests for each resource types. But if you have
-time, your PR is welcome!
+It was not my priority to write the tests for each resource types or
+communicators. But if you have time, your PR is welcome!
 
 License
 -------
@@ -61,7 +64,7 @@ License
 
     MIT License
 
-    Copyright (c) 2019 Nissar Chababy
+    Copyright (c) 2019, 2020 Nissar Chababy
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

@@ -39,6 +39,7 @@ License
     SOFTWARE.
 """
 
+import copy
 import inspect
 import urllib.parse as urllib_parse
 from functools import wraps
@@ -94,7 +95,7 @@ class CommunicatorBase:
         """
 
         @wraps(func)
-        def wrapper(self, **kwargs):
+        def wrapper(self, **kwargs):  # pragma: no cover
             response = func(self, **kwargs)  # pylint:disable=not-callable
 
             ignore_sharing = [
@@ -120,7 +121,9 @@ class CommunicatorBase:
                         "com"
                     ]["requester"]
 
-                response = CommunicatorBase.propagate_vars(to_propagate, response)
+                response = CommunicatorBase.propagate_internal_vars(
+                    to_propagate, response
+                )
             return response
 
         return wrapper
@@ -135,7 +138,7 @@ class CommunicatorBase:
         """
 
         @wraps(func)
-        def wrapper(self, **kwargs):
+        def wrapper(self, **kwargs):  # pragma: no cover
 
             if "repository_id_or_slug" in kwargs:
                 kwargs["repository_id_or_slug"] = self.encode_slug(
@@ -147,37 +150,46 @@ class CommunicatorBase:
         return wrapper
 
     @classmethod
-    def propagate_vars(cls, variables: dict, start_obj: object) -> object:
+    def propagate_internal_vars(cls, variables: dict, start_obj: Any) -> object:
         """
         Propagate the given var to all objects.
+
+        .. warning::
+            You are not invited to use this method outside of PyTravis's
+            communicators.
         """
 
         for var_name, var_value in variables.items():
-            if hasattr(start_obj, var_name):
-                if isinstance(var_value, dict):
-                    start_obj[var_name].update(var_value)
+            try:
+                if hasattr(start_obj, var_name):
+                    if isinstance(var_value, dict):
+                        start_obj[var_name].update(var_value)
+                    else:
+                        start_obj[var_name] = var_value
                 else:
                     start_obj[var_name] = var_value
-            else:
-                start_obj[var_name] = var_value
+            except TypeError:
+                continue
 
         try:
             for _, value in start_obj.__dict__.items():
                 if hasattr(value, "_at_type"):
-                    value = cls.propagate_vars(variables, value)
+                    value = cls.propagate_internal_vars(variables, value)
                 elif isinstance(value, list):
-                    value = [cls.propagate_vars(variables, x) for x in value]
-        except AttributeError:
+                    value = [cls.propagate_internal_vars(variables, x) for x in value]
+        except AttributeError:  # pragma: no cover
             pass
         return start_obj
 
-    @classmethod
-    def is_digit(cls, data: Union[str, int]) -> bool:
+    @staticmethod
+    def is_digit(data: Union[str, int]) -> bool:
         """
         Checks if the given data is an integer or a digit string.
         """
 
-        return isinstance(data, int) or (isinstance(data, str) and data.isdigit())
+        return (not isinstance(data, bool) and isinstance(data, int)) or (
+            isinstance(data, str) and data.isdigit()
+        )
 
     @classmethod
     def encode_slug(cls, slug: str) -> str:
@@ -185,52 +197,60 @@ class CommunicatorBase:
         Encodes the (repository) slug.
         """
 
-        if slug and not cls.is_digit(slug) and "%" not in slug:
+        if slug and not cls.is_digit(slug) and "%" not in slug and "/" in slug:
             slug = urllib_parse.quote(slug, safe="")
 
         return slug
 
-    @classmethod
-    def get_method_name(cls) -> str:
+    @staticmethod
+    def get_method_name() -> str:  # pragma: no cover
         """
         Provides the method name.
+
+        .. warning::
+            You are not invited to use this method outside of PyTravisCI's
+            communicators.
         """
 
         return inspect.getouterframes(inspect.currentframe(), 2)[2][3]
 
-    def get_standardized(self, data: dict) -> Any:
+    def get_standardized(self, data: dict) -> Any:  # pragma: no cover
         """
         Provides the standardized version of the given dataset.
         """
 
         try:
             self.standardizer.set_data(data)
-            return self.standardizer.get_standized()
+            return self.standardizer.get_standardized()
         except AttributeError:
             return data
 
-    def get_response(self, endpoint: str) -> dict:
+    def get_response(self, endpoint: str) -> dict:  # pragma: no cover
         """
         Provides the response from the API.
         """
 
         return self.requester.get(endpoint)
 
-    def post_response(self, endpoint: str, data: dict = None) -> dict:
+    def post_response(
+        self, endpoint: str, data: dict = None
+    ) -> dict:  # pragma: no cover
         """
         POST and provides the response from the API.
         """
 
         return self.requester.post(endpoint, data=data)
 
-    def patch_response(self, endpoint: str, data: dict = None) -> dict:
+    def patch_response(
+        self, endpoint: str, data: dict = None
+    ) -> dict:  # pragma: no cover
         """
         PATCH and provides the response from the API.
         """
 
         return self.requester.patch(endpoint, data=data)
 
-    def delete_response(self, endpoint: str) -> Union[dict, bool]:
+    def delete_response(self, endpoint: str) -> Union[dict, bool]:  # pragma: no cover
         """
         DELETE and provides the response from the API.
         """
@@ -243,13 +263,13 @@ class CommunicatorBase:
                 return True
             return False
 
-    def get_and_construct_endpoint(self, kwargs: dict) -> str:
+    def get_and_construct_endpoint(self, kwargs: dict) -> str:  # pragma: no cover
         """
         Provides the endpoint to call from the given method name.
         """
 
         if "parameters" in kwargs and kwargs["parameters"]:
-            params = urllib_parse.urlencode(kwargs["parameters"].copy())
+            params = urllib_parse.urlencode(copy.deepcopy(kwargs["parameters"]))
 
             del kwargs["parameters"]
 

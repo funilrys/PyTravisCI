@@ -1,7 +1,7 @@
 """
 Just another Travis CI (API) Python interface.
 
-A module which provides the communicator of the "Beta Feature" resource type.
+This is the main entry of the tests of the project.
 
 Author:
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
@@ -38,48 +38,3 @@ License
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 """
-
-import copy
-from typing import Union
-
-from .base import CommunicatorBase
-
-
-class BetaFeature(CommunicatorBase):
-    """
-    The communicator of the Beta feature resource type.
-    """
-
-    # pylint: disable=missing-function-docstring
-
-    endpoints = {
-        "update": "/user/%(user_id)s/beta_feature/%(beta_feature_id)s",
-        "delete": "/user/%(user_id)s/beta_feature/%(beta_feature_id)s",
-    }
-
-    @CommunicatorBase.complete_response
-    def update(self, **kwargs) -> "resource_types.BetaFeature":
-        data = None
-
-        if "data" in kwargs:
-            data = copy.deepcopy(kwargs["data"])
-
-            del kwargs["data"]
-
-        return self.resource_types.BetaFeature(
-            **self.get_standardized(
-                self.patch_response(self.get_and_construct_endpoint(kwargs), data=data)
-            )
-        )
-
-    @CommunicatorBase.complete_response
-    def delete(self, **kwargs) -> Union[bool, "resource_types.BetaFeature"]:
-        response = self.get_standardized(
-            self.delete_response(self.get_and_construct_endpoint(kwargs))
-        )
-        try:
-            data = self.resource_types.BetaFeature(**response)
-        except TypeError:
-            data = response
-
-        return data

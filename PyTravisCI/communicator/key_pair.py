@@ -39,7 +39,7 @@ License
     SOFTWARE.
 """
 
-
+import copy
 from typing import Any, Union
 
 from .base import CommunicatorBase
@@ -84,7 +84,7 @@ class KeyPair(CommunicatorBase):
         data = None
 
         if "data" in kwargs:
-            data = kwargs["data"].copy()
+            data = copy.deepcopy(kwargs["data"])
 
             del kwargs["data"]
 
@@ -100,7 +100,7 @@ class KeyPair(CommunicatorBase):
         data = None
 
         if "data" in kwargs:
-            data = kwargs["data"].copy()
+            data = copy.deepcopy(kwargs["data"])
 
             del kwargs["data"]
 
