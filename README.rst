@@ -83,15 +83,8 @@ Simply run the following and enjoy our documentation!
 Why is there a lack of tests?
 -----------------------------
 
-Well, I don't know what you may call "lack" but I wrote tests for what I thought
-was important.
-
-But, if you read what I wrote previously, I said:
-
-    It has been meant to fit my needs but I hope that it will be useful to others.
-
-which means that I use this project at least once a few week and automated
-almost every day.
+Well, I don't know what you may call "lack" but I wrote (105!) tests for what I
+think is important.
 
 It was not my priority to write the tests for each resource types or
 communicators. But if you have time, your PR is welcome!
