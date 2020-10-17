@@ -40,7 +40,7 @@ License
 """
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import PyTravisCI.communicator._all as communicator
 import PyTravisCI.defaults as defaults
@@ -127,6 +127,9 @@ class Build(ResourceTypesBase):
     commit: Optional["resource_types.Commit"] = None
     jobs: Optional[List["resource_types.Job"]] = None
     stages: Optional[List["resource_types.Stage"]] = None
+    created_by: Optional[
+        Union["resource_types.User", "resource_types.Organization"]
+    ] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
