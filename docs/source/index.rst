@@ -42,7 +42,7 @@ CI API v3 has to offer.
 It can also helps you with the encryption of information and files.
 Give the interface a variable name and its value and it will gives you what
 you are supposed to write into your :code:`.travis.yml` configuration file.
-Same with the encryption of files.
+Same with the encryption of files and the linting of your configuration files.
 
 Please keep in mind that:
 
