@@ -105,7 +105,7 @@ class ResourceTypesBase:
         raise AttributeError(f"{index} (index) not found.")
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} {self.__dict__} />"
+        return f"<{self.__class__.__name__} {self.to_dict()} />"
 
     def __setattr__(self, name: str, value: Any) -> None:
 
