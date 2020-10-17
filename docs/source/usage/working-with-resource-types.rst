@@ -2,7 +2,43 @@ Working with resource type objects
 ----------------------------------
 
 Although resource types have some nice method to help you, PyTravisCI provides
-you some other useful "helpers".
+you some other useful "helpers" to make it "easier".
+
+Access to information
+"""""""""""""""""""""
+
+Let's read our information.
+
+::
+
+
+    from PyTravisCI import TravisCI
+
+    # We initiate our "communication" object.
+    travis = TravisCI(acces_token="XYZ")
+
+    # We get our very own account information.
+    me = travis.get_user()
+
+    # We can read the JSON representation to get an idea of what we get.
+    print(me.json())
+
+Now let's say we want to read our :code:`id` and :code:`login`.
+We can do it like we will do with a :py:class:`dict`.
+
+::
+
+    my_id = me["id"]
+    my_login = me["login"]
+
+Or by accessing the attribute
+
+::
+
+    my_id = me.id
+    my_login = me.login
+
+
 
 :py:class:`repr` representation
 """""""""""""""""""""""""""""""
@@ -162,13 +198,14 @@ API. We made it a bit simplier :-).
     # Note: we limit to 3 because we have much more!
     my_repositories = travis.get_repositories(params={"limit": 3})
 
-    while my_repositories.has_next_page():
-        # We loop until we are sure there is no page (anymore).
-
+    while True:
         for repository in my_repositories:
             print(repository.json())
 
-        my_repositories = my_repositories.next_page()
+        if my_repositories.has_next_page():
+            my_repositories = my_repositories.next_page()
+            continue
+        break
 
 Last page of a resource type
 """"""""""""""""""""""""""""
@@ -206,9 +243,7 @@ back to the first page. It's possible too!
     # Note: we limit to 3 because we have much more!
     my_repositories = travis.get_repositories(params={"limit": 3}).last_page()
 
-    while my_repositories.has_next_page():
-        # We loop until we are sure there is no page (anymore).
-
+    while True:
         funilrys_repo_found = False
 
         for repository in my_repositories:
@@ -218,6 +253,8 @@ back to the first page. It's possible too!
 
         if not funilrys_repo_found:
             my_repositories = my_repositories.next_page()
+            continue
+        break
 
     # Now we work from the first page :-)
     my_repositories = my_repositories.first_page()
@@ -238,10 +275,11 @@ Sometime you want to loop backwards :-).
     # Note: we limit to 3 because we have much more!
     my_repositories = travis.get_repositories(params={"limit": 3}).last_page()
 
-    while my_repositories.has_previous_page():
-        # We loop until we are sure there is no page (anymore).
-
+    while True:
         for repository in my_repositories:
             print(repository.json())
 
-        my_repositories = my_repositories.previous_page()
+        if my_repositories.has_previous_page():
+            my_repositories = my_repositories.previous_page()
+            continue
+        break
