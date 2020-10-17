@@ -33,7 +33,7 @@ def get_version():
 # -- Project information -----------------------------------------------------
 
 project = PACKAGE_NAME
-copyright = "2019, Nissar Chababy (@funilrys)"
+copyright = "2019, 2020 Nissar Chababy (@funilrys)"
 author = "Nissar Chababy (@funilrys)"
 
 # The full version, including alpha/beta/rc tags
