@@ -66,6 +66,8 @@ from .organization import Organization
 from .organizations import Organizations
 from .repositories import Repositories
 from .repository import Repository
+from .request import Request
+from .requests import Requests
 from .setting import Setting
 from .settings import Settings
 from .stages import Stages

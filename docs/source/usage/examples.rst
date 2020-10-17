@@ -205,6 +205,26 @@ Lint a configuration file
                 f"MESSAGE:\n\n{warning.message}\n\n"
             )
 
+Create a new (build) request
+""""""""""""""""""""""""""""
+
+::
+
+    from PyTravisCI import TravisCI
+
+    # We initiate our "communication" object.
+    travis = TravisCI(acces_token="XYZ")
+
+    # Let's get the repository to work with.
+    repository = travis.get_repository("funilrys/PyTravisCI")
+
+    # Let's create a new request.
+    print(
+        repository.create_request(
+            "Hello, this request was created with PyTravisCI", "master"
+        ).json()
+    )
+
 Encrypt global environment variables for our configuration files
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 

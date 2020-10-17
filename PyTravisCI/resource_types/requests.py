@@ -1,7 +1,7 @@
 """
 Just another Travis CI (API) Python interface.
 
-A module which provides all public available resource types.
+A module which provides the "Requests" resource type.
 
 Author:
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
@@ -39,41 +39,31 @@ License
     SOFTWARE.
 """
 
+from typing import List, Optional
 
-# pylint: disable=unused-import
-from .active import Active
-from .beta_feature import BetaFeature
-from .beta_features import BetaFeatures
-from .branch import Branch
-from .branches import Branches
-from .broadcast import Broadcast
-from .broadcasts import Broadcasts
-from .build import Build
-from .builds import Builds
-from .cache import Cache
-from .caches import Caches
-from .commit import Commit
-from .cron import Cron
-from .crons import Crons
-from .env_var import EnvVar
-from .env_vars import EnvVars
-from .installation import Installation
-from .job import Job
-from .jobs import Jobs
-from .key_pair import KeyPair
-from .key_pair_generated import KeyPairGenerated
-from .lint import Lint
-from .log import Log
-from .message import Message
-from .messages import Messages
-from .organization import Organization
-from .organizations import Organizations
-from .repositories import Repositories
-from .repository import Repository
-from .request import Request
-from .requests import Requests
-from .setting import Setting
-from .settings import Settings
-from .stage import Stage
-from .stages import Stages
-from .user import User
+from . import _all as resource_types
+from .base import ResourceTypesBase
+
+
+class Requests(ResourceTypesBase):
+    """
+    Provides the list of requests.
+
+    Official Travis CI API documentation
+        - https://developer.travis-ci.org/resource/builds
+
+    :ivar requests: List of requests.
+    :vartype builds:
+        List[:class:`~PyTravisCI.resource_types.request.Requests`]
+    """
+
+    __iter_through__: str = "requests"
+    requests: Optional[List["resource_types.Request"]] = None
+
+    def __init__(self, **kwargs) -> None:
+        if "requests" in kwargs:
+            kwargs["requests"] = [
+                resource_types.Request(**x) for x in kwargs["requests"]
+            ]
+
+        super().__init__(**kwargs)

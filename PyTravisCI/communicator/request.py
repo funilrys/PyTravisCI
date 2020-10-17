@@ -1,7 +1,7 @@
 """
 Just another Travis CI (API) Python interface.
 
-A module which provides all public available resource types.
+A module which provides the communicator of the "Request" resource type.
 
 Author:
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
@@ -39,41 +39,35 @@ License
     SOFTWARE.
 """
 
+from .base import CommunicatorBase
 
-# pylint: disable=unused-import
-from .active import Active
-from .beta_feature import BetaFeature
-from .beta_features import BetaFeatures
-from .branch import Branch
-from .branches import Branches
-from .broadcast import Broadcast
-from .broadcasts import Broadcasts
-from .build import Build
-from .builds import Builds
-from .cache import Cache
-from .caches import Caches
-from .commit import Commit
-from .cron import Cron
-from .crons import Crons
-from .env_var import EnvVar
-from .env_vars import EnvVars
-from .installation import Installation
-from .job import Job
-from .jobs import Jobs
-from .key_pair import KeyPair
-from .key_pair_generated import KeyPairGenerated
-from .lint import Lint
-from .log import Log
-from .message import Message
-from .messages import Messages
-from .organization import Organization
-from .organizations import Organizations
-from .repositories import Repositories
-from .repository import Repository
-from .request import Request
-from .requests import Requests
-from .setting import Setting
-from .settings import Settings
-from .stage import Stage
-from .stages import Stages
-from .user import User
+
+class Request(CommunicatorBase):
+    """
+    The communicator of the Request resource type.
+    """
+
+    # pylint: disable=missing-function-docstring
+
+    endpoints = {
+        "from_provider": "/repo/%(provider)s/%(repository_id_or_slug)s/request/%(request_id)s",
+        "from_id_or_slug": "/repo/%(repository_id_or_slug)s/request/%(request_id)s",
+    }
+
+    @CommunicatorBase.complete_response
+    @CommunicatorBase.filter_before_action
+    def from_provider(self, **kwargs) -> "resource_types.Request":
+        return self.resource_types.Request(
+            **self.get_standardized(
+                self.get_response(self.get_and_construct_endpoint(kwargs))
+            )
+        )
+
+    @CommunicatorBase.complete_response
+    @CommunicatorBase.filter_before_action
+    def from_id_or_slug(self, **kwargs) -> "resource_types.Request":
+        return self.resource_types.Request(
+            **self.get_standardized(
+                self.get_response(self.get_and_construct_endpoint(kwargs))
+            )
+        )

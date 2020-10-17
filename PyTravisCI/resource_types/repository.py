@@ -523,6 +523,93 @@ class Repository(ResourceTypesBase):
 
         return comm.from_id_or_slug(repository_id_or_slug=self.id, parameters=params)
 
+    def get_request(
+        self, request_id: Union[str, int], *, params: Optional[dict] = None
+    ) -> "resource_types.Request":
+        """
+        Provides a single request from its given ID.
+
+        Official Travis CI API documentation:
+            - https://developer.travis-ci.org/resource/requests
+
+        :param request_id:
+            The ID of the request to get.
+
+        :param params:
+            The query parameters to append to the URL.
+        """
+
+        comm = getattr(communicator, "Request")(self._PyTravisCI["com"]["requester"])
+
+        return comm.from_id_or_slug(
+            request_id=request_id, repository_id_or_slug=self.id, parameters=params
+        )
+
+    def get_requests(
+        self, *, params: Optional[dict] = None
+    ) -> "resource_types.Requests":
+        """
+        Provides the list of requests of the current repository.
+
+        Official Travis CI API documentation:
+            - https://developer.travis-ci.org/resource/requests
+
+        :param params:
+            The query parameters to append to the URL.
+        """
+
+        comm = getattr(communicator, "Requests")(self._PyTravisCI["com"]["requester"])
+
+        return comm.from_id_or_slug(repository_id_or_slug=self.id, parameters=params)
+
+    def create_request(
+        self,
+        message: str,
+        branch: str,
+        *,
+        config: Optional[dict] = None,
+        params: Optional[dict] = None,
+    ) -> "resource_types.Request":
+        """
+        Creates a Request
+
+        :param message:
+            Travis-ci status message attached to the request.
+        :param branch:
+            Branch requested to be built.
+        :param config:
+            Build configuration (as parsed from .travis.yml).
+
+        :raise TypeError:
+            When the types of :code:`name` and :code:`value`
+            are not :py:class`str` nor :py:class`bytes`.
+        """
+
+        if not isinstance(message, str):
+            raise TypeError(
+                f"<message> {message} should be {str}. {type(message)} given."
+            )
+
+        if not isinstance(branch, str):
+            raise TypeError(f"<branch> {branch} should be {str}. {type(branch)} given.")
+
+        if config and not isinstance(config, dict):
+            raise TypeError(
+                f"<branch> {config} should be {dict}. {type(branch)} given."
+            )
+
+        data = {
+            "request.message": message,
+            "request.branch": branch,
+        }
+
+        if config:
+            data["request.config"] = config
+
+        comm = getattr(communicator, "Requests")(self._PyTravisCI["com"]["requester"])
+
+        return comm.create(repository_id_or_slug=self.id, data=data, parameters=params)
+
     def encrypt_env_var(
         self, env_vars: dict, padding: Optional[str] = "PKCS1v15"
     ) -> dict:

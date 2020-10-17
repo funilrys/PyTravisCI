@@ -49,6 +49,8 @@ Therefore, using this tool without the documentation while using the
 .. include:: organizations.rst
 .. include:: repositories.rst
 .. include:: repository.rst
+.. include:: request.rst
+.. include:: requests.rst
 .. include:: setting.rst
 .. include:: settings.rst
 .. include:: stage.rst

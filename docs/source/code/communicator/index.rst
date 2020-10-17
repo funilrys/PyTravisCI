@@ -38,5 +38,7 @@ with them.
 .. include:: organizations.rst
 .. include:: repositories.rst
 .. include:: repository.rst
+.. include:: request.rst
+.. include:: requests.rst
 .. include:: stages.rst
 .. include:: user.rst
