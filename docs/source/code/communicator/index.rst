@@ -32,7 +32,6 @@ with them.
 .. include:: key_pair.rst
 .. include:: lint.rst
 .. include:: log.rst
-.. include:: log.rst
 .. include:: messages.rst
 .. include:: organization.rst
 .. include:: organizations.rst
