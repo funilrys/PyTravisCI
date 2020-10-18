@@ -1,5 +1,5 @@
 """
-Just another Travis CI (API) Python interface.
+Just another Python API for Travis CI (API).
 
 A module which provides the requester object. It's the object which communicates
 with the API endpoints.

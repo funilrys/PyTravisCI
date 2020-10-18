@@ -30,7 +30,7 @@ PyTravisCI - Just another Travis CI (API) Python interface
 
 ---------------
 
-Just another Travis CI (API) Python interface.
+Just another Python API for Travis CI (API).
 It has been meant to fit my needs but in hope that it will be useful to others.
 
 In other words, PyTravisCI gives us a Python interface to interact with the

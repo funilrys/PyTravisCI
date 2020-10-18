@@ -1,5 +1,5 @@
 """
-Just another Travis CI (API) Python interface.
+Just another Python API for Travis CI (API).
 
 A module which provides some defaults date format provided by the Travis CI API
 (in the past or today).

@@ -1,5 +1,5 @@
 """
-Just another Travis CI (API) Python interface.
+Just another Python API for Travis CI (API).
 
 A module which provides some of the package informations.
 Author:
@@ -38,5 +38,5 @@ License
     SOFTWARE.
 """
 
-__version__ = "2.0.0a1"
+__version__ = "2.0.0"
 __author__ = "Nissar Chababy"

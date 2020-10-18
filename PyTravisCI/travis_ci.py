@@ -1,5 +1,5 @@
 """
-Just another Travis CI (API) Python interface.
+Just another Python API for Travis CI (API).
 
 A module which provides the gateway to the Travis CI API. All interaction starts
 with this module's class-es.

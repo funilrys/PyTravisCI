@@ -1,5 +1,5 @@
 """
-Just another Travis CI (API) Python interface.
+Just another Python API for Travis CI (API).
 
 A submodule which provides the communicator.
 Communicator are in charge of binding response from the Travis CI API with our

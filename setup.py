@@ -1,5 +1,5 @@
 """
-Just another Travis CI (API) Python interface.
+Just another Python API for Travis CI (API).
 
 Author
     Nissar Chababy, @funilrys, contactTATAfunilrysTODTODcom
@@ -90,7 +90,7 @@ if __name__ == "__main__":
         version=get_version(),
         python_requires=">=3.6, <4",
         install_requires=get_requirements(),
-        description="Just another Travis CI (API) Python interface.",
+        description="Just another Python API for Travis CI (API).",
         long_description=get_long_description(),
         author="funilrys",
         author_email="contact@funilrys.com",

@@ -1,5 +1,5 @@
 """
-Just another Travis CI (API) Python interface.
+Just another Python API for Travis CI (API).
 
 A module which provides the standardizer class. It's basically a way to unify
 everything before parsing them to their end-location or objects.
