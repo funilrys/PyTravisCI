@@ -1,5 +1,5 @@
-PyTravisCI - Just another Travis CI (API) Python interface
-==========================================================
+PyTravisCI - Just another Python API for Travis CI (API)
+========================================================
 
 .. image:: https://travis-ci.com/funilrys/PyTravisCI.svg?branch=master
     :target: https://travis-ci.com/funilrys/PyTravisCI
