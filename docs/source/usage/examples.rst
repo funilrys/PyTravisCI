@@ -19,7 +19,7 @@ Information of the current user
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # We get the current user information.
     me = travis.get_user()
@@ -34,10 +34,10 @@ Repositories of the current user
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # We get the initial list of Repositories
-    repositories = travis.repositoris()
+    repositories = travis.get_repositories()
 
     while True:
         # We loop until there is no more page to navigate.
@@ -58,7 +58,7 @@ Organizations of the current user
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # We get the jobs.
     organizations = travis.get_organizations()
@@ -86,7 +86,7 @@ Active builds of the current user
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # We get the current user information.
     me = travis.get_user()
@@ -114,7 +114,7 @@ Builds of the current user
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # We get the builds.
     builds = travis.get_builds()
@@ -139,7 +139,7 @@ Jobs of the current user
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # We get the jobs.
     jobs = travis.get_jobs()
@@ -163,7 +163,7 @@ Restart the last build of a repository
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # We get the repository that interests us.
     repository = travis.get_repository("funilrys/PyTravisCI")
@@ -193,7 +193,7 @@ Lint a configuration file
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     with open(".travis.yml", "r") as file_stream:
         for index, warning in enumerate(travis.lint(file_stream)):
@@ -213,7 +213,7 @@ Create a new (build) request
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # Let's get the repository to work with.
     repository = travis.get_repository("funilrys/PyTravisCI")
@@ -240,7 +240,7 @@ your configuration file.
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # Let's get the repository we want to work with.
     repository = travis.get_repository("funilrys/PyTravisCI")
@@ -287,7 +287,7 @@ files.
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # Let's get the repository we want to work with.
     repository = travis.get_repository("funilrys/PyTravisCI")
@@ -316,7 +316,7 @@ This is what we will do in this example.
     from PyTravisCI import TravisCI
 
     # We initiate our "communication" object.
-    travis = TravisCI(acces_token="XYZ")
+    travis = TravisCI(access_token="XYZ")
 
     # Let's get the repository we want to work with.
     repository = travis.get_repository("funilrys/PyTravisCI")
