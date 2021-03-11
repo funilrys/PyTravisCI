@@ -83,7 +83,7 @@ class EnvVar(CommunicatorBase):
         data = None
 
         if "data" in kwargs:
-            data = copy.deepcopy(["data"])
+            data = copy.deepcopy(kwargs["data"])
 
             del kwargs["data"]
 
