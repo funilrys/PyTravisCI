@@ -22,7 +22,7 @@ PyTravisCI - Just another Python API for Travis CI (API)
 ---------------
 
 .. image:: https://pepy.tech/badge/PyTravisCI/week
-    :target: https://pepy.tech/project/pyfunceble
+    :target: https://pepy.tech/project/PyTravisCI
 .. image:: https://pepy.tech/badge/PyTravisCI/month
     :target: https://pepy.tech/project/PyTravisCI
 .. image:: https://pepy.tech/badge/PyTravisCI
